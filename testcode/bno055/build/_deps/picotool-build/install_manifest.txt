@@ -1,0 +1,5 @@
+C:/bno055/bbm/build/_deps/picotool/picotool.exe
+C:/bno055/bbm/build/_deps/picotool/picotoolTargets.cmake
+C:/bno055/bbm/build/_deps/picotool/picotoolTargets-debug.cmake
+C:/bno055/bbm/build/_deps/picotool/picotoolConfig.cmake
+C:/bno055/bbm/build/_deps/picotool/picotoolConfigVersion.cmake
