@@ -1,5 +1,5 @@
 #Add an executable target to be build from the source files
-add_executable(gps NEMAParser.cpp main.cpp SerialConnection.cpp)
+add_executable(gps NEMAParser.cpp main.cpp)
 
 #Pull in our pico_stdlib which aggregates commonly used features
 target_link_libraries(gps 

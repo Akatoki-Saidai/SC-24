@@ -11,30 +11,49 @@
 
 #define UART_ID uart1
 #define BAUD_RATE 39200  // ビットレートこれだっけ？
+#define DATA_BITS 8
+#define STOP_BITS 1
+#define PARITY    UART_PARITY_NONE
 
 #define UART_TX_PIN 4
 #define UART_RX_PIN 5
 
 static int chars_rxed = 0;
 
+char uart_buffer[256];
 
-Binary uart_read() const
-{
-    std::deque<uint8_t> other_data(0);
-    std::swap(uart1_queue, other_data);
-    return Binary(other_data);  // 割り込み処理で一時保存しておいたデータを返す
-}
+// RX interrupt handler
+void on_uart_rx() {
+    while (uart_is_readable(UART_ID)) {
+        // uint8_t ch = uart_getc(UART_ID);
+        // Can we send it back?
 
-void uart1_handler()
-{
-    while (uart_is_readable(UART_ID))
-    {
-        uart1_queue.push_back(uart_getc(UART_ID));  // 1文字読み込んで末尾に値を追加
+        // if (uart_is_writable(UART_ID)) {
+        //     // Change it slightly first!
+        //     ch++;
+        //     uart_putc(UART_ID, ch);
+        // }
+        chars_rxed++;
     }
-    
 }
+
+int Serial_receive(char *buffer, size_t length) {
+    size_t count = 0;
+
+    while (count < length) {
+        // データが受信可能か確認
+        if (uart_is_readable(UART_ID)) {
+            // 受信したデータをバッファに格納
+            buffer[count++] = uart_getc(UART_ID);
+        }
+    }
+    return count; // 受信したバイト数を返す
+}
+
 
 int main() {
+  stdio_init_all();
+
   std::ofstream ofs_all_log("all_log.txt");
   std::ofstream ofs_some_log("some_log.csv");
 
@@ -57,22 +76,40 @@ int main() {
   gpio_set_function(UART_TX_PIN, GPIO_FUNC_UART);
   gpio_set_function(UART_RX_PIN, GPIO_FUNC_UART);
 
+  int __unused actual = uart_set_baudrate(UART_ID, BAUD_RATE);
+  
+  // Set UART flow control CTS/RTS, we don't want these, so turn them off
+  uart_set_hw_flow(UART_ID, false, false);
+  
+  // Set our data format
+  uart_set_format(UART_ID, DATA_BITS, STOP_BITS, PARITY);
+  
+  // Turn off FIFO's - we want to do this character by character
+  uart_set_fifo_enabled(UART_ID, false);
+  
+  // Set up a RX interrupt
+  // We need to set up the handler first
+  // Select correct interrupt for the UART we are using
   int UART_IRQ = UART_ID == uart0 ? UART0_IRQ : UART1_IRQ;
+  
+  // And set up and enable the interrupt handlers
   irq_set_exclusive_handler(UART_IRQ, on_uart_rx);
   irq_set_enabled(UART_IRQ, true);
+  
+  // Now enable the UART to send interrupts - RX only
   uart_set_irq_enables(UART_ID, true, false);
+
 
   NEMAParser::NEMAParser parser;
   NEMAParser::ErrorCode error;
   while (true) {
-    usleep(1000000.f); // 100ms
+    sleep_us(1000000.f); // 100ms
     ofs_all_log << "-----START-----" << std::endl;
     // std::istringstream ss(uart_getc(UART_ID, '\n'y));
     
-    while (uart_is_readable(UART_ID)) {
-        std::istringstream ss(uart_read());
-    }
-
+    int received_bytes = Serial_receive(uart_buffer, sizeof(uart_buffer) - 1);
+    std::istringstream ss(uart_buffer);
+    
     std::string buffer;
     while (std::getline(ss, buffer, '\n') ) {
      error = parser.parse(buffer);
