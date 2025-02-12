@@ -25,17 +25,17 @@ ErrorCode NEMAParser::parse(const std::string &data) {
   // parse
   ErrorCode error = ErrorCode::kNoError;
   const std::string &type = splited_data.front();
-  if (type == "GPGGA" || type == "GNGGA") {
+  if (type == "GPGGA" || type == "GNGGA" || type == "GLGGA") {
     error = parseGPGGA(splited_data, gpgga_);
-  } else if (type == "GPGLL" || type == "GNGLL") {
+  } else if (type == "GPGLL" || type == "GNGLL" || type == "GLGLL") {
     error = parseGPGLL(splited_data, gpgll_);
-  } else if (type == "GPGSA") {
+  } else if (type == "GPGSA" || type == "GNGSA" || type == "GLGSA") {
     error = parseGPGSA(splited_data, gpgsa_);
-  } else if (type == "GPGSV") {
+  } else if (type == "GPGSV" || type == "GLGSV") {
     error = parseGPGSV(splited_data, gpgsv_);
-  } else if (type == "GPRMC" || type == "GNRMC") {
+  } else if (type == "GPRMC" || type == "GNRMC" || type == "GLRMC") {
     error = parseGPRMC(splited_data, gprmc_);
-  } else if (type == "GPVTG") {
+  } else if (type == "GPVTG" || type == "GLVTG") {
     error = parseGPVTG(splited_data, gpvtg_);
   } else if (type == "GPZDA") {
     error = parseGPZDA(splited_data, gpzda_);

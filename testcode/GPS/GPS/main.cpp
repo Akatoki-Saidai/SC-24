@@ -9,7 +9,6 @@
 #include "hardware/uart.h"
 
 
-
 #define UART_ID uart0
 #define BAUD_RATE 38400  // ビットレートこれだっけ？
 #define DATA_BITS 8
