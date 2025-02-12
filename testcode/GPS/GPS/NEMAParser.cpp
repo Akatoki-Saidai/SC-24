@@ -25,15 +25,15 @@ ErrorCode NEMAParser::parse(const std::string &data) {
   // parse
   ErrorCode error = ErrorCode::kNoError;
   const std::string &type = splited_data.front();
-  if (type == "GPGGA") {
+  if (type == "GPGGA" || type == "GNGGA") {
     error = parseGPGGA(splited_data, gpgga_);
-  } else if (type == "GPGLL") {
+  } else if (type == "GPGLL" || type == "GNGLL") {
     error = parseGPGLL(splited_data, gpgll_);
   } else if (type == "GPGSA") {
     error = parseGPGSA(splited_data, gpgsa_);
   } else if (type == "GPGSV") {
     error = parseGPGSV(splited_data, gpgsv_);
-  } else if (type == "GPRMC") {
+  } else if (type == "GPRMC" || type == "GNRMC") {
     error = parseGPRMC(splited_data, gprmc_);
   } else if (type == "GPVTG") {
     error = parseGPVTG(splited_data, gpvtg_);
@@ -134,7 +134,7 @@ ErrorCode NEMAParser::parseGPGSA(const std::vector<std::string> &data, GPGSA &gp
 ErrorCode NEMAParser::parseGPGSV(const std::vector<std::string> &data, GPGSV &gpgsv) const {
   if (data.size() != gpgsv.data_num) {
     gpgsv.reset();
-    return ErrorCode::kGPGSAInvalid;
+    return ErrorCode::kGPGSVInvalid;
   }
   gpgsv.total_message_num       = Common::convertToIntFromDecimal(data.at(1));
   gpgsv.message_number          = Common::convertToIntFromDecimal(data.at(2));

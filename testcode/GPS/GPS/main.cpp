@@ -21,7 +21,7 @@
 
 // static int chars_rxed = 0;
 
-char uart_buffer[256];
+char uart_buffer_temp[512];
 
 // RX interrupt handler
 /*  割り込み無効化
@@ -44,8 +44,8 @@ int Serial_receive(char *buffer, size_t length) {
     size_t count = 0;
     
     // タイムアウト
-    auto start_time = get_absolute_time();
-    const int TIMEOUT_MS = 10*1000000;  // マイクロ秒
+    absolute_time_t start_time = get_absolute_time();
+    const int TIMEOUT_US = 10*1000000;  // マイクロ秒
 
     // テスト用
     std::cout << length << std::endl;
@@ -57,20 +57,55 @@ int Serial_receive(char *buffer, size_t length) {
         if (uart_is_readable(UART_ID)) {
             // 受信したデータをバッファに格納
             buffer[count++] = uart_getc(UART_ID);
-            // テスト用
-            std::cout << count << std::endl;
+           
+            // std::cout << count << std::endl;  // テスト用
         }
         
         // タイムアウト
-        auto now = get_absolute_time();
-        if ((now - start_time) > TIMEOUT_MS) {
+        absolute_time_t now = get_absolute_time();
+        if (absolute_time_diff_us(start_time, now) > TIMEOUT_US) {
             std::cout << "Timeout reached" << std::endl;
             break;
         }
 
         // sleep_ms(10);
     }
+    buffer[count] = '\0';
+
     return count; // 受信したバイト数を返す
+}
+
+std::vector<std::string> ExtractSentences(std::string &buffer) {
+    std::vector<std::string> sentences;
+    while (true) {
+        // '$' がある位置を検索
+        size_t start = buffer.find('$');
+        if (start == std::string::npos) {
+            // '$' が見つからない場合破棄
+            buffer.clear();
+            break;
+        }
+
+        // '$' より前は削除
+        if (start > 0) {
+            buffer.erase(0, start);
+            start = 0;
+        }
+        // '$' から先頭の '\r' を検索
+        size_t end = buffer.find('\r', start);
+        if (end == std::string::npos) {
+            
+            break;  // まだ完全な文が得られていない
+        }
+
+        // '$'から'\r'までを抽出（'\r' を含める）
+        std::string sentence = buffer.substr(start, end - start + 1);
+        sentences.push_back(sentence);
+
+        // 抽出した部分以外を削除
+        buffer.erase(0, end + 1);
+    }
+    return sentences;
 }
 
 
@@ -123,6 +158,7 @@ int main() {
 
   NEMAParser::NEMAParser parser;
   NEMAParser::ErrorCode error;
+  std::string uart_buffer;
 
   gpio_init(PICO_DEFAULT_LED_PIN);
   gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
@@ -138,13 +174,23 @@ int main() {
     std::cout << "-----START-----" << std::endl;
     // std::istringstream ss(uart_getc(UART_ID, '\n'y));
     
-    int received_bytes = Serial_receive(uart_buffer, sizeof(uart_buffer) - 1);
-    std::cout << received_bytes << std::endl;
-    
-    std::istringstream ss(uart_buffer);
-    std::string line;
-    while (std::getline(ss, line, '\n')) {
-        error = parser.parse(line);
+    int received_bytes = Serial_receive(uart_buffer_temp, sizeof(uart_buffer_temp) - 1);
+    if (received_bytes > 0) {
+        // 読み込んだ生データをrx_bufferに追加
+        uart_buffer.append(uart_buffer_temp);
+    }
+
+    std::cout << "receive bytes: " << received_bytes << std::endl;
+    std::cout << "buffer: " << uart_buffer_temp << std::endl;
+ 
+
+    std::vector<std::string> sentences = ExtractSentences(uart_buffer);
+    for (const auto &sentence : sentences) {
+
+        std::cout << "Extracted sentence: " << sentence << std::endl;
+
+        // パーサーに渡して解析する
+        error = parser.parse(sentence);
         if (error != NEMAParser::ErrorCode::kNoError) {
             ofs_all_log << "Error Code = " << static_cast<int>(error) << std::endl;
             std::cout << "Error Code = " << static_cast<int>(error) << std::endl;
