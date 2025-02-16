@@ -25,7 +25,7 @@ add_executable(test_project
 )
 
 # Pico SDKのライブラリとリンク
-target_link_libraries(test_project pico_stdlib hardware_pwm)
+target_link_libraries(test_project pico_stdlib hardware_pwm hardware_gpio)
 
 # USB出力を有効にし，UART出力を無効にする
 pico_enable_stdio_usb(test_project 1)

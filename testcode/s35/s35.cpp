@@ -1,8 +1,10 @@
 #include "s35.hpp"
 #include "pico/stdlib.h"
+#include "hardware/gpio.h"
 #include "hardware/pwm.h"
 #include <iostream>
 #include <cmath>
+
 
 S35::S35(int pin,int freq)
     : pin(pin), freq(freq) {}
@@ -12,16 +14,21 @@ S35::~S35() {
 }
 
 void S35::start() {
-    gpio_init(pin);               // ピンの初期化
-    gpio_set_dir(pin, GPIO_OUT);  // 出力ピンとして設定
+    // gpio_init(pin);               // ピンの初期化
+    // gpio_set_dir(pin, GPIO_OUT);  // 出力ピンとして設定
 
     // PWMの設定
+    gpio_set_function(pin,GPIO_FUNC_PWM);
     uint slice_num = pwm_gpio_to_slice_num(pin);
-    pwm_set_wrap(slice_num, 24999);    //1周期20ms
-    pwm_set_clkdiv(slice_num, 100);   // クロック分周 (50Hz)
+    static pwm_config servo_slice_config = pwm_get_default_config();
+
     pwm_set_enabled(slice_num, true); // PWMを有効化
+    pwm_config_set_clkdiv(&servo_slice_config, 100);   // クロック分周 (50Hz)
+    pwm_config_set_wrap(&servo_slice_config, 24999);    //1周期20ms
+    pwm_init(slice_num, &servo_slice_config, true);
     //参考：https://rikei-tawamure.com/entry/2021/02/08/213335
     //pwm_set_wrapは(24999+1)/125000000[s]=20[ms]が一周期となる。詳しくは参考サイトのクロックの分割のところを参照。
+    // 1周期の秒数 = ((ラップ + 1) * 分周比) / 125000000
 }
 
 void S35::stop() {
@@ -37,12 +44,12 @@ void S35::stop() {
 
 void S35::left_turn() {
     // パルス幅を設定(1000[us]~2000[us]で動作するらしい)
-    int pulse_width = 2000; //[us]
+    double pulse_width = 2000; //[us]
 
     uint slice_num = pwm_gpio_to_slice_num(pin);
 
-    // デューティサイクルの計算（1000~2000us -> 0~65535範囲に変換）
-    uint duty_cycle = (pulse_width/20000)*65535;
+    // デューティカウントの計算
+    uint duty_cycle = ((pulse_width / 20000) * (24999 + 1)) - 1;  // duty比換算で0.1
 
     // PWMデューティサイクルの設定
     pwm_set_gpio_level(pin, duty_cycle);  // 正規化されたデューティサイクル
@@ -52,12 +59,12 @@ void S35::left_turn() {
 void S35::right_turn() {
 
     // パルス幅を設定(1000[us]~2000[us]で動作するらしい)
-    int pulse_width = 1000;//[us]
+    double pulse_width = 1000;//[us]
 
     uint slice_num = pwm_gpio_to_slice_num(pin);
 
-    // デューティサイクルの計算（1000~2000us -> 0~65535範囲に変換)
-    uint duty_cycle = (pulse_width/20000)*65535;
+    // デューティカウントの計算
+    uint duty_cycle = ((pulse_width / 20000) * (24999 + 1)) - 1;
 
     // PWMデューティサイクルの設定
     pwm_set_gpio_level(pin, duty_cycle);  // 正規化されたデューティサイクル
@@ -67,12 +74,12 @@ void S35::right_turn() {
 void S35::stop_turn() {
 
     // パルス幅を設定(1000[us]~2000[us]で動作するらしい)
-    int pulse_width = 1500;//[us]
+    double pulse_width = 1500;//[us]
 
     uint slice_num = pwm_gpio_to_slice_num(pin);
 
-    // デューティサイクルの計算（1000~2000us -> 0~65535範囲に変換）
-    uint duty_cycle = (pulse_width/20000)*65535;
+    // デューティカウントの計算
+    uint duty_cycle = ((pulse_width / 20000) * (24999 + 1)) - 1;
 
     // PWMデューティサイクルの設定
     pwm_set_gpio_level(pin, duty_cycle);  // 正規化されたデューティサイクル
