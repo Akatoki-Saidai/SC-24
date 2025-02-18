@@ -3,22 +3,22 @@
 
 #include "pico/stdlib.h"
 
-class SG90 {
+class SG90{
 public:
-    SG90(int pin = 18, int min_angle = -90, int max_angle = 90, int ini_angle = 0, int freq = 50);
-    ~SG90();
+    SG90(int pin = 18, int freq = 50);//コンストラクタ
+    ~SG90();//デストラクタ
 
     void start();
     void stop();
-    void setAngle(int target_angle);
-    void setIniAngle();
+    // void left_turn();
+    // void right_turn();
+    // void stop_turn();
+    void turn(int deg);
+    void init_turn();
+
 
 private:
     int pin;
-    int max_angle;
-    int min_angle;
-    int angle;
-    int ini_angle;
     int freq;
 };
 
