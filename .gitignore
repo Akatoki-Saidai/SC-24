@@ -4,10 +4,12 @@ CMakeFiles
 CMakeScripts
 Testing
 Makefile
+picotool
 cmake_install.cmake
 install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
+pico_flash_region.ld
 _deps
 *.bin
 *.dis
