@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include "pico/stdlib.h"
-#include "hardware/i2c.h"
+#include "bno055.hpp"
 
 static int addr = 0x28;
 

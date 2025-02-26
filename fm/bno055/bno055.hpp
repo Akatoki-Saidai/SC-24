@@ -1,9 +1,12 @@
 #ifndef BNO055_H
 #define BNO055_H
 
-#include "pico/stdlib.h"
 #include <tuple>
 #include <vector>
+#include <iostream>
+
+#include "pico/stdlib.h"
+#include "hardware/i2c.h"
 
 class BNO055{
 public:

@@ -1,6 +1,6 @@
 # ビルドを実行するファイルを追加
 add_library(BNO055 STATIC
-    ${CMAKE_CURRENT_LIST_DIR}/BNO055.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/bno055.cpp
 )
 # 以下の資料を参考にしました
 # https://qiita.com/kikochan/items/732e46e92e7f29c18ce9
