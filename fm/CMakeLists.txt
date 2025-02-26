@@ -33,9 +33,11 @@ endif()
 pico_sdk_init()
 
 # サブディレクトリを登録
-add_subdirectory(S35)
-add_subdirectory(BNO055)
-
+add_subdirectory(bmp280)
+add_subdirectory(bno055)
+add_subdirectory(GPS)
+add_subdirectory(s35)
+add_subdirectory(sd_card)
 
 # 実行ファイルを作成
 add_executable(FM
@@ -45,8 +47,10 @@ add_executable(FM
 # コンパイルする際にライブラリをリンク
 target_link_libraries(FM
     pico_stdlib
-    S35
+    BMP280
     BNO055
+    S35
+    SD
 )
 
 # USB出力を有効にし，UART出力を無効にする
