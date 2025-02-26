@@ -1,4 +1,4 @@
-#include "NEMAParser.h"
+#include "nema_parser.hpp"
 #include <fstream>
 #include <iostream>
 #include <sstream>

@@ -3,9 +3,9 @@
 
 #include <string>
 #include <vector>
-#include "Common.h"
-#include "Error.h"
-#include "GpsSentences.h"
+#include "common.hpp"
+#include "error.hpp"
+#include "gps_sentences.hpp"
 
 namespace NEMAParser {
 

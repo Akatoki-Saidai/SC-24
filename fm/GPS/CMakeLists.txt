@@ -1,38 +1,39 @@
-# 最低限必要なCMakeのバージョンを設定
-cmake_minimum_required(VERSION 3.12)
-
-# プログラミング言語を設定
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 17)
-
-# Pico-SDKのパスを設定 (環境によって違う)
-# set(PICO_SDK_PATH "C:/Pico/pico-sdk")
-set(PICO_DEFAULT_GCC_TRIPLE arm-none-eabi)
-
-
-# SDKの読み込み (プロジェクトに関する設定の前にある必要がある)
-include(pico_sdk_import.cmake)
-
-# プロジェクトを設定
-project(Flyback C CXX ASM)
-
-# 例外を有効にする
-set(PICO_CXX_ENABLE_EXCEPTIONS 1)
-set(PICO_CXX_ENABLE_RTTI 1)
+# ビルドを実行するファイルを追加
+add_library(GPS STATIC
+    ${CMAKE_CURRENT_LIST_DIR}/nema_parser.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/gps.cpp
+)
 # 以下の資料を参考にしました
-# https://community.element14.com/products/raspberry-pi/b/blog/posts/raspberry-pico-and-cmake---enable-c-exceptions-and-rtti-run-time-type-information
+# https://qiita.com/kikochan/items/732e46e92e7f29c18ce9
+# https://qiita.com/shohirose/items/45fb49c6b429e8b204ac
 
-# 警告レベルを上げる
-if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /EHsc")
-else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++17")
-endif()
-# 以下の資料を参考にしました
-# https://theolizer.com/cpp-school1/cpp-school1-7/#w4
+# ライブラリの読み込み
+target_link_libraries(GPS
+    pico_stdlib
+    hardware_uart
+)
 
-# SDKを初期化
-pico_sdk_init()
 
-# サブディレクトリを登録
-add_subdirectory(GPS)
+# cmake_minimum_required(VERSION 3.12)
+
+# include(pico_sdk_import.cmake)
+
+# project(project1 C CXX ASM)
+# set(CMAKE_C_STANDARD 11)
+# set(CMAKE_CXX_STANDARD 17)
+
+# pico_sdk_init()
+
+# add_executable(GPS
+#     nema_parser.cpp
+# )
+
+# target_link_libraries(GPS
+#     pico_stdlib
+#     hardware_i2c
+# )
+
+# pico_enable_stdio_usb(GPS 1)
+# pico_enable_stdio_uart(GPS 0)
+
+# pico_add_extra_outputs(GPS)

@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD 17)
 include(pico_sdk_import.cmake)
 
 # プロジェクトを設定
-project(BBM C CXX ASM)
+project(FM C CXX ASM)
 
 # 例外を有効にする
 set(PICO_CXX_ENABLE_EXCEPTIONS 1)
