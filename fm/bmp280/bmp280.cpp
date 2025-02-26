@@ -4,10 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
- #include <stdio.h>
- #include <string.h>
- #include "pico/stdlib.h"
- #include "hardware/i2c.h"
+#include "bmp280.hpp"
  
  /* Example code to talk to a bmp280 temperature/pressure sensor.
  

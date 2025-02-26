@@ -1,4 +1,4 @@
-#include "s35/s35.hpp"
+#include "fm.hpp"
 #include <math.h>
 // #include "pico/stdlib.h"
 #include <vector>
@@ -65,41 +65,45 @@ std::pair<double, double> calc_xy(double phi_deg, double lambda_deg, double phi0
 
     // (2), S, Aの計算
     double A_ = (m0 * a) / (1. + n) * A[0]; // [m]
-    double S_ = (m0 * a) / (1. + n) * (A[0] * phi0_rad + A[1] * sin(2 * phi0_rad) + A[2] * sin(4 * phi0_rad) +
-                                      A[3] * sin(6 * phi0_rad) + A[4] * sin(8 * phi0_rad) + A[5] * sin(10 * phi0_rad)); // [m]
+    double S_ = (m0 * a) / (1. + n) * (A[0] * phi0_rad + A[1] * std::sin(2 * phi0_rad) + A[2] * std::sin(4 * phi0_rad) +
+                                      A[3] * std::sin(6 * phi0_rad) + A[4] * std::sin(8 * phi0_rad) + A[5] * std::sin(10 * phi0_rad)); // [m]
 
     // (3) lambda_c, lambda_sの計算
-    double lambda_c = cos(lambda_rad - lambda0_rad);
-    double lambda_s = sin(lambda_rad - lambda0_rad);
+    double lambda_c = std::cos(lambda_rad - lambda0_rad);
+    double lambda_s = std::sin(lambda_rad - lambda0_rad);
 
     // (4) t, t_の計算
-    double t = sinh(atanh(sin(phi_rad)) - ((2 * sqrt(n)) / (1 + n)) * atanh(((2 * sqrt(n)) / (1 + n)) * sin(phi_rad)));
-    double t_ = sqrt(1 + t * t);
+    double t = std::sinh(std::atanh(std::sin(phi_rad)) - ((2 * std::sqrt(n)) / (1 + n)) * std::atanh(((2 * std::sqrt(n)) / (1 + n)) * std::sin(phi_rad)));
+    double t_ = std::sqrt(1 + t * t);
 
     // (5) xi', eta'の計算
-    double xi2 = atan2(t / lambda_c); // [rad]
-    double eta2 = atanh(lambda_s / t_);
+    double xi2 = std::atanh(t / lambda_c); // [rad]
+    double eta2 = std::atanh(lambda_s / t_);
 
     // (6) x, yの計算
-    double x = A_ * (xi2 + alpha[1] * sin(2 * xi2) + alpha[2] * sin(4 * xi2) + alpha[3] * sin(6 * xi2) +
-                     alpha[4] * sin(8 * xi2) + alpha[5] * sin(10 * xi2)) - S_; // [m]
-    double y = A_ * (eta2 + alpha[1] * cos(2 * xi2) + alpha[2] * cos(4 * xi2) + alpha[3] * cos(6 * xi2) +
-                     alpha[4] * cos(8 * xi2) + alpha[5] * cos(10 * xi2)); // [m]
+    double x = A_ * (xi2 + alpha[1] * std::sin(2 * xi2) + alpha[2] * std::sin(4 * xi2) + alpha[3] * std::sin(6 * xi2) +
+                     alpha[4] * std::sin(8 * xi2) + alpha[5] * std::sin(10 * xi2)) - S_; // [m]
+    double y = A_ * (eta2 + alpha[1] * std::cos(2 * xi2) + alpha[2] * std::cos(4 * xi2) + alpha[3] * std::cos(6 * xi2) +
+                     alpha[4] * std::cos(8 * xi2) + alpha[5] * std::cos(10 * xi2)); // [m]
 
     return {x, y}; // [m]
 }
 
 // 時計回りに回転する関数
 std::pair<double, double> Rotation_clockwise_xy(std::pair<double, double> vec_xy, double radian) {
-    double sin_rad = sin(radian);
-    double cos_rad = cos(radian);
+    double sin_rad = std::sin(radian);
+    double cos_rad = std::cos(radian);
     double new_vector_x = vec_xy.first * cos_rad + vec_xy.second * sin_rad;
     double new_vector_y = vec_xy.second * cos_rad - vec_xy.first * sin_rad;
 
     return {new_vector_x, new_vector_y};
 }
 
-void fallfase()
+/*****************  コンパイルを通すために仮でおいておきます *****************************/
+class GPS{public: std::pair<double,double> read() const {return {0, 0};}};
+/*************************************************************************************/
+
+void fallfase(BNO055& bno055, const GPS& gps)
 {
     //------ちゃんと動くか確認するためのコード-----
     // std::vector<float> mag_vector = {0.0,0.0,0.0};
@@ -113,38 +117,38 @@ void fallfase()
     //-------------------------------------------
 
     //処理に使うデータ
-    double g_lon = gps_data_goal[0];//ゴールの経度
-    double g_lat = gps_data_goal[1];//ゴールの緯度
-    double c_lon = gps_data_cansat[0];//自分の経度
-    double c_lat = gps_data_cansat[1];//自分の緯度
-    std::pair<double,double> North_xy = {bno_data[6],bno_data[7]};//cansatから見た北の方向(xy平面)
+    double g_lon = std::get<0>(gps_data_goal);//ゴールの経度
+    double g_lat = std::get<1>(gps_data_goal);//ゴールの緯度
+    double c_lon = std::get<0>(gps_data_cansat);//自分の経度
+    double c_lat = std::get<1>(gps_data_cansat);//自分の緯度
+    std::pair<double,double> North_xy = {bno_data[2][0],bno_data[2][1]};//cansatから見た北の方向(xy平面)
     std::pair<double,double> Cansat_forward_xy = {1.0,0.0};//正面をx軸の方としている(これはbnoの向き次第、違ったら適宜変更)
 
     //cansatを原点とした座標でgoalを表す
     std::pair<double, double> goal_xy = calc_xy(g_lat,g_lon,c_lat,c_lon);
     //距離を求める
-    double distance = sqrt((goal_xy.first)*(goal_xy.first)+(goal_xy.second)*(goal_xy.second));
+    double distance = std::sqrt((goal_xy.first)*(goal_xy.first)+(goal_xy.second)*(goal_xy.second));
 
     //方角基底(北がx軸の右手系)からCansat基底(正面がx軸の右手系)にgoal_xyを変換----------------------
     //step1:北がx軸になるように変換(現在は東がx軸なので、基底を90°だけ反時計回りに回転⇔成分を90°だけ時計回りに回転)
     std::pair<double, double> goal_xy_north_basis = Rotation_clockwise_xy(goal_xy,M_PI/2);
     //step2:方角基底からcansat基底に変換
     //step2-1:北が正面から見て何度反時計回りにズレているかを計算
-    double North_angle_cansat_basis = atan2(North_xy.second,North_xy.first) - atan2(Cansat_forward_xy.second,Cansat_forward_xy.first);
+    double North_angle_cansat_basis = std::atan2(North_xy.second,North_xy.first) - std::atan2(Cansat_forward_xy.second,Cansat_forward_xy.first);
     //step2-2:ズレている分だけ基底を回転させる(成分は反時計回転なので-1をかけてあげる)
     std::pair<double,double> goal_xy_cansat_basis = Rotation_clockwise_xy(goal_xy_north_basis,-1*North_angle_cansat_basis);
     //------------------------------------------------------------------------------------------
     //ここまでの操作で、Cansat正面をx軸とした基底でgoalの方向を定めることができた。
     //あとは、その角度からどっちに舵を取ればいいかを決めればよい。
     //角度を求める(0~2PI)
-    double goal_angle_cansat_basis = atan2(goal_xy_cansat_basis.second,goal_xy_cansat_basis.first);
+    double goal_angle_cansat_basis = std::atan2(goal_xy_cansat_basis.second,goal_xy_cansat_basis.first);
     goal_angle_cansat_basis = goal_angle_cansat_basis + M_PI;
     //角度から指示を出す。
 
     //要変更！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
     //加速度(進行方向)考慮ver---------------------------------------------------
-    std::pair<double, double> forward_accel = (bno_data[0],bno_data[1]);
-    double North_angle_cansat_basis = atan2(forward_accel.second,forward_accel.first) - atan2(goal_xy_cansat_basis.second,goal_xy_cansat_basis.first);
+    std::pair<double, double> forward_accel = {bno_data[0][0],bno_data[0][1]};
+    North_angle_cansat_basis = std::atan2(forward_accel.second,forward_accel.first) - std::atan2(goal_xy_cansat_basis.second,goal_xy_cansat_basis.first);
     if(North_angle_cansat_basis>(M_PI/4)){
         basic_right_count = 1;
         basic_left_count = 0;
@@ -152,17 +156,17 @@ void fallfase()
             s35_left.left_turn();
             sleep_ms(2000);
             right_count = right_count - 1;
-        }else if{
+        }else{
             s35_left.right_turn();
             sleep_ms(2000);
             right_count = right_count + 1;
         }
-        if (left_count>left_count)
+        if (left_count>basic_left_count)
         {
             s35_right.right_turn();
             sleep_ms(2000);
             left_count = left_count - 1;
-        }else if{
+        }else{
             s35_right.right_turn();
             sleep_ms(2000);
             left_count = left_count + 1;
@@ -174,17 +178,17 @@ void fallfase()
             s35_left.left_turn();
             sleep_ms(2000);
             right_count = right_count - 1;
-        }else if{
+        }else{
             s35_left.right_turn();
             sleep_ms(2000);
             right_count = right_count + 1;
         }
-        if (left_count>left_count)
+        if (left_count>basic_left_count)
         {
             s35_right.right_turn();
             sleep_ms(2000);
             left_count = left_count - 1;
-        }else if{
+        }else{
             s35_right.right_turn();
             sleep_ms(2000);
             left_count = left_count + 1;
@@ -192,7 +196,7 @@ void fallfase()
     }
 
 
-    if ((3*M_PI/4) <= goal_angle_cansat_basis < (5*M_PI/4))//正面にゴールがある時の指示
+    if ((3*M_PI/4) <= goal_angle_cansat_basis && goal_angle_cansat_basis < (5*M_PI/4))//正面にゴールがある時の指示
     {
         while (right_count!=0 && left_count!=0)//もう巻き取っている場合はより戻して左右均等にする。
         {
@@ -200,28 +204,28 @@ void fallfase()
                 s35_left.left_turn();
                 sleep_ms(2000);
                 right_count = right_count - 1;
-            }else if{
+            }else{
                 s35_left.right_turn();
                 sleep_ms(2000);
                 right_count = right_count + 1;
             }
-            if (left_count>left_count)
+            if (left_count>basic_left_count)
             {
                 s35_right.right_turn();
                 sleep_ms(2000);
                 left_count = left_count - 1;
-            }else if{
+            }else{
                 s35_right.right_turn();
                 sleep_ms(2000);
                 left_count = left_count + 1;
             }
         }
-    }else if((1*M_PI/4) <= goal_angle_cansat_basis < (3*M_PI/4))//右にゴールがあるときの指示
+    }else if((1*M_PI/4) <= goal_angle_cansat_basis && goal_angle_cansat_basis < (3*M_PI/4))//右にゴールがあるときの指示
     {
         s35_left.right_turn();
         sleep_ms(2000);
         right_count = right_count + 1;
-    }else if((5*M_PI/4) <= goal_angle_cansat_basis < (7*M_PI/4))//左にゴールがあるときの指示
+    }else if((5*M_PI/4) <= goal_angle_cansat_basis && goal_angle_cansat_basis < (7*M_PI/4))//左にゴールがあるときの指示
     {
         s35_right.left_turn();
         sleep_ms(2000);
@@ -361,7 +365,7 @@ std::vector<double> calc_xy(double phi_deg,double lambda_deg,double phi0_deg,dou
     std::vector<int> indices = {1, 2, 3, 4, 5};
     std::vector<double> alpha_array_5 = alpha_array_6;//コピー
     alpha_array_5.erase(alpha_array_5.begin());//始めの要素を消す(これで要素5つに)
-    // sum(alpha_array[1:] * (sin(2*xi2*n) * cosh(2*eta2*n)))
+    // sum(alpha_array[1:] * (std::sin(2*xi2*n) * cosh(2*eta2*n)))
     double sum_x = std::inner_product(indices.begin(), indices.end(), alpha_array_5.begin() + 1, 0.0,
         std::plus<>(),
         [&](int n, double alpha) {
@@ -369,7 +373,7 @@ std::vector<double> calc_xy(double phi_deg,double lambda_deg,double phi0_deg,dou
         }
     );
 
-    // sum(alpha_array[1:] * (cos(2*xi2*n) * sinh(2*eta2*n)))
+    // sum(alpha_array[1:] * (std::cos(2*xi2*n) * std::sinh(2*eta2*n)))
     double sum_y = std::inner_product(indices.begin(), indices.end(), alpha_array_5.begin() + 1, 0.0,
         std::plus<>(),
         [&](int n, double alpha) {

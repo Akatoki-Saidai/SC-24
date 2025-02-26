@@ -67,7 +67,7 @@ std::vector<std::string> NEMAParser::split(const std::string &data) const {
 }
 
 ErrorCode NEMAParser::parseGPGGA(const std::vector<std::string> &data, GPGGA &gpgga) const {
-  if (data.size() != gpgga_.data_num) {
+  if (data.size() != std::size_t(gpgga_.data_num)) {
     gpgga.reset();
     return ErrorCode::kGPGGAInvalid;
   }
@@ -90,7 +90,7 @@ ErrorCode NEMAParser::parseGPGGA(const std::vector<std::string> &data, GPGGA &gp
 }
 
 ErrorCode NEMAParser::parseGPGLL(const std::vector<std::string> &data, GPGLL &gpgll) const {
-  if (data.size() != gpgll.data_num) {
+  if (data.size() != std::size_t(gpgll.data_num)) {
     gpgll.reset();
     return ErrorCode::kGPGLLInvalid;
   }
@@ -106,7 +106,7 @@ ErrorCode NEMAParser::parseGPGLL(const std::vector<std::string> &data, GPGLL &gp
 }
 
 ErrorCode NEMAParser::parseGPGSA(const std::vector<std::string> &data, GPGSA &gpgsa) const {
-  if (data.size() != gpgsa.data_num) {
+  if (data.size() != std::size_t(gpgsa.data_num)) {
     gpgsa.reset();
     return ErrorCode::kGPGSAInvalid;
   }
@@ -132,7 +132,7 @@ ErrorCode NEMAParser::parseGPGSA(const std::vector<std::string> &data, GPGSA &gp
 }
 
 ErrorCode NEMAParser::parseGPGSV(const std::vector<std::string> &data, GPGSV &gpgsv) const {
-  if (data.size() != gpgsv.data_num) {
+  if (data.size() != std::size_t(gpgsv.data_num)) {
     gpgsv.reset();
     return ErrorCode::kGPGSVInvalid;
   }
@@ -160,7 +160,7 @@ ErrorCode NEMAParser::parseGPGSV(const std::vector<std::string> &data, GPGSV &gp
 }
 
 ErrorCode NEMAParser::parseGPRMC(const std::vector<std::string> &data, GPRMC &gprmc) const {
-  if (data.size() != gprmc.data_num) {
+  if (data.size() != std::size_t(gprmc.data_num)) {
     gprmc.reset();
     return ErrorCode::kGPRMCInvalid;
   }
@@ -181,7 +181,7 @@ ErrorCode NEMAParser::parseGPRMC(const std::vector<std::string> &data, GPRMC &gp
 }
 
 ErrorCode NEMAParser::parseGPVTG(const std::vector<std::string> &data, GPVTG &gpvtg) const {
-  if (data.size() != gpvtg.data_num) {
+  if (data.size() != std::size_t(gpvtg.data_num)) {
     gpvtg.reset();
     return ErrorCode::kGPVTGInvalid;
   }
@@ -199,7 +199,7 @@ ErrorCode NEMAParser::parseGPVTG(const std::vector<std::string> &data, GPVTG &gp
 }
 
 ErrorCode NEMAParser::parseGPZDA(const std::vector<std::string> &data, GPZDA &gpzda) const {
-  if (data.size() != gpzda.data_num) {
+  if (data.size() != std::size_t(gpzda.data_num)) {
     gpzda.reset();
     return ErrorCode::kGPZDAInvalid;
   }

@@ -1,6 +1,6 @@
 #include "fm.hpp"
 
-enum class Fase
+enum class Phase
 {
     Wait,
     Fall,
@@ -21,7 +21,7 @@ int fm_main()
     gpio_pull_up(6);
     gpio_pull_up(7);
     //BNO055のセットアップ
-    BNO055 bno055();
+    BNO055 bno055;
 
 
     // ************************************************** //

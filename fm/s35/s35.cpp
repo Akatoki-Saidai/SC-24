@@ -40,7 +40,7 @@ void S35::left_turn() {
     // パルス幅を設定(1000[us]~2000[us]で動作するらしい)
     double pulse_width = 2000; //[us]
 
-    uint slice_num = pwm_gpio_to_slice_num(pin);
+    // uint slice_num = pwm_gpio_to_slice_num(pin);  // これを使っていないのは本当に正常？
 
     // デューティカウントの計算
     uint duty_cycle = ((pulse_width / 20000) * (24999 + 1)) - 1;  // duty比換算で0.1
@@ -55,7 +55,7 @@ void S35::right_turn() {
     // パルス幅を設定(1000[us]~2000[us]で動作するらしい)
     double pulse_width = 1000;//[us]
 
-    uint slice_num = pwm_gpio_to_slice_num(pin);
+    // uint slice_num = pwm_gpio_to_slice_num(pin);  // これを使っていないのは本当に正常？
 
     // デューティカウントの計算
     uint duty_cycle = ((pulse_width / 20000) * (24999 + 1)) - 1;
@@ -70,7 +70,7 @@ void S35::stop_turn() {
     // パルス幅を設定(1000[us]~2000[us]で動作するらしい)
     double pulse_width = 1500;//[us]
 
-    uint slice_num = pwm_gpio_to_slice_num(pin);
+    // uint slice_num = pwm_gpio_to_slice_num(pin);  // これを使っていないのは本当に正常？
 
     // デューティカウントの計算
     uint duty_cycle = ((pulse_width / 20000) * (24999 + 1)) - 1;
