@@ -15,7 +15,7 @@
     "C_Cpp.formatting": "clangFormat",
     "C_Cpp.clang_format_path": "/workspaces/pico-dev-container/.clang-format",
     "C_Cpp.clang_format_sortIncludes": true,
-    "cmake.configureOnOpen": true,
+    "cmake.configureOnOpen": false,
     "cmake.enableAutomaticKitScan": false,
     "cmake.launchBehavior": "breakAndReuseTerminal",
     "cmake.buildTask": true,
@@ -28,4 +28,9 @@
     "cmake.environment": {
         "CLICOLOR_FORCE": "1"
     },
+    "cmake.generator": "",
+    "cmake.configureEnvironment": {},
+    "cmake.configureArgs": [
+        ""
+    ],
 }
