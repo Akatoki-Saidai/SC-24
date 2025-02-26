@@ -1,10 +1,4 @@
 #include "s35.hpp"
-#include "pico/stdlib.h"
-#include "hardware/gpio.h"
-#include "hardware/pwm.h"
-#include <iostream>
-#include <cmath>
-
 
 S35::S35(int pin,int freq)
     : pin(pin), freq(freq) {}
