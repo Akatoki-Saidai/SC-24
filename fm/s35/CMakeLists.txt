@@ -9,8 +9,8 @@ add_library(S35 STATIC
 # ライブラリの読み込み
 target_link_libraries(S35
     pico_stdlib
-    hardware_pwm 
     hardware_gpio
+    hardware_pwm 
 )
 
 # # CMake最小バージョン設定

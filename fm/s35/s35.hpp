@@ -1,7 +1,12 @@
 #ifndef S35_H
 #define S35_H
 
+#include <cmath>
+#include <iostream>
+
 #include "pico/stdlib.h"
+#include "hardware/gpio.h"
+#include "hardware/pwm.h"
 
 class S35{
 public:
