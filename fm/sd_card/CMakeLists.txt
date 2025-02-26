@@ -1,5 +1,5 @@
 # ライブラリを読み込み
-add_subdirectory(lib/no-OS-FatFS-SD-SPI-RPi-Pico/FatFs_SPI build)
+add_subdirectory(FatFs_SPI build)
 
 # ビルドを実行するファイルを追加
 add_library(SD STATIC
