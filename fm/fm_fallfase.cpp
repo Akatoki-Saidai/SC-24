@@ -107,7 +107,7 @@ void fallfase()
     // auto gps_data_cansat = {0.0,0.0};
     //-------------------------------------------
     //------本番用のコード------------------------
-    std::vector<std::vector<float>> bno_data = bno055.read();//{accel,grv,mag}の順番で入っている想定
+    std::vector<std::vector<double>> bno_data = bno055.read();//{accel,grv,mag}の順番で入っている想定
     std::pair<double,double> gps_data_cansat = gps.read();//{lon,lat}で入っている想定
     std::pair<double,double> gps_data_goal = {0.0,0.0};//ここは自分で入力
     //-------------------------------------------
