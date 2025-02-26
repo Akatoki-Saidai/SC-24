@@ -31,6 +31,7 @@
     "cmake.generator": "",
     "cmake.configureEnvironment": {},
     "cmake.configureArgs": [
-        ""
+        "-DPICO_PLATFORM=rp2350",
+        "-DPICO_BOARD=pico2"
     ],
 }
