@@ -1,5 +1,5 @@
 #Add an executable target to be build from the source files
-add_executable(SDcard main.cpp)
+add_executable(SDcard main.cpp hw_config.c)
 
 # Tell CMake where to find other source code
 add_subdirectory(lib/no-OS-FatFS-SD-SPI-RPi-Pico/FatFs_SPI build)
