@@ -10,6 +10,8 @@ int left_count = 0;//左に曲がった時のカウント
 int basic_right_count = 0;
 int basic_left_count = 0;
 
+constexpr double radius_e = 6378000; //地球半径(m)
+
 //degreeからradへの変換
 double deg_to_rad(const double& num)
     {return num * M_PI / 180.0;}
@@ -82,6 +84,17 @@ std::pair<double, double> calc_xy(double phi_deg, double lambda_deg, double phi0
 
     return {x, y}; // [m]
 }
+
+// //三角関数verのcalc_xy
+// std::pair<double,double> calc_xy(double phi_deg, double lambda_deg, double phi0_deg, double lambda0_deg){
+//     double difference_lon = lambda_deg - lambda0_deg;
+//     double difference_lat = phi_deg - phi0_deg;
+//     double x = difference_lon*radius_e;
+//     double y = difference_lat*radius_e;
+//     return{x,y};
+// }
+
+
 
 // 時計回りに回転する関数
 std::pair<double, double> Rotation_clockwise_xy(std::pair<double, double> vec_xy, double radian) {
