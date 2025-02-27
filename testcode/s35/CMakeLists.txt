@@ -14,6 +14,27 @@ include(pico_sdk_import.cmake)
 # プロジェクトを設定
 project(test C CXX ASM)
 
+
+#以下fmからコピー
+
+# 例外を有効にする
+set(PICO_CXX_ENABLE_EXCEPTIONS 1)
+set(PICO_CXX_ENABLE_RTTI 1)
+# 以下の資料を参考にしました
+# https://community.element14.com/products/raspberry-pi/b/blog/posts/raspberry-pico-and-cmake---enable-c-exceptions-and-rtti-run-time-type-information
+
+# 警告レベルを上げる
+if(MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /EHsc")
+else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++17")
+endif()
+# 以下の資料を参考にしました
+# https://theolizer.com/cpp-school1/cpp-school1-7/#w4
+
+#以上
+
+
 # Pico SDKの初期化
 pico_sdk_init()
 
