@@ -99,10 +99,6 @@ std::pair<double, double> Rotation_clockwise_xy(std::pair<double, double> vec_xy
     return {new_vector_x, new_vector_y};
 }
 
-/*****************  コンパイルを通すために仮でおいておきます *****************************/
-class GPS{public: std::pair<double,double> read() const {return {0, 0};}};
-/*************************************************************************************/
-
 void fallphase(BNO055& bno055, const GPS& gps)
 {
     //------ちゃんと動くか確認するためのコード-----
@@ -279,7 +275,7 @@ void fallphase(BNO055& bno055, const GPS& gps)
         s35_right.left_turn();
         sleep_ms(2000);
         left_count = left_count + 1;
-    }else if(goal_angle_cansat_basis < (1*M_PI/4)||(7*M_PI/4) && (1*M_PI/4)||(7*M_PI/4) <= goal_angle_cansat_basis)//後ろにゴールがあるときの指示
+    }else if(goal_angle_cansat_basis < (1*M_PI/4) || (7*M_PI/4) <= goal_angle_cansat_basis)//後ろにゴールがあるときの指示
     {
         s35_left.right_turn();
         sleep_ms(4000);
