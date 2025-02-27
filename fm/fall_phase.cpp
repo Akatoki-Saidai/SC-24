@@ -99,7 +99,11 @@ std::pair<double, double> Rotation_clockwise_xy(std::pair<double, double> vec_xy
     return {new_vector_x, new_vector_y};
 }
 
-void fall_phase(BMP280& bmp280, BNO055& bno055, const GPS& gps)
+/*****************  コンパイルを通すために仮でおいておきます *****************************/
+class GPS{public: std::pair<double,double> read() const {return {0, 0};}};
+/*************************************************************************************/
+
+void fallphase(BNO055& bno055, const GPS& gps)
 {
     //------ちゃんと動くか確認するためのコード-----
     // std::vector<float> mag_vector = {0.0,0.0,0.0};
@@ -143,9 +147,11 @@ void fall_phase(BMP280& bmp280, BNO055& bno055, const GPS& gps)
 
     //要変更！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
     //加速度(進行方向)考慮ver---------------------------------------------------
+    //加速度の方向
     std::pair<double, double> forward_accel = {bno_data[0][0],bno_data[0][1]};
-    North_angle_cansat_basis = std::atan2(forward_accel.second,forward_accel.first) - std::atan2(goal_xy_cansat_basis.second,goal_xy_cansat_basis.first);
-    if(North_angle_cansat_basis>(M_PI/4)){
+    std::pair<double, double> forward_accel_goal_basis = Rotation_clockwise_xy(forward_accel,goal_angle_cansat_basis);
+    double accel_angle_goal_basis = atan2(forward_accel_goal_basis[1],forward_accel_goal_basis[0]);
+    if(accel_angle_goal_basis>(M_PI/4)){
         basic_right_count = 1;
         basic_left_count = 0;
         if(right_count>basic_right_count){
@@ -157,7 +163,7 @@ void fall_phase(BMP280& bmp280, BNO055& bno055, const GPS& gps)
             sleep_ms(2000);
             right_count = right_count + 1;
         }else{
-            return;
+            break;
         }
         if (left_count>basic_left_count)
         {
@@ -170,21 +176,21 @@ void fall_phase(BMP280& bmp280, BNO055& bno055, const GPS& gps)
             left_count = left_count + 1;
         }
         else{
-            return;
+            break;
         }
-    }else if(North_angle_cansat_basis>(-1*M_PI/4)){
+    }else if(accel_angle_goal_basis>(-1*M_PI/4)){
         basic_right_count = 0;
         basic_left_count = 1;
         if(right_count>basic_right_count){
             s35_left.left_turn();
             sleep_ms(2000);
             right_count = right_count - 1;
-        }else if(right_count<basic_right_count){
+        }else if(){right_count<basic_right_count
             s35_left.right_turn();
             sleep_ms(2000);
             right_count = right_count + 1;
         }else{
-            return;
+            break;
         }
         if (left_count>basic_left_count)
         {
@@ -196,7 +202,7 @@ void fall_phase(BMP280& bmp280, BNO055& bno055, const GPS& gps)
             sleep_ms(2000);
             left_count = left_count + 1;
         }else{
-            return;
+            break;
         }
     }
 
