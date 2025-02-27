@@ -51,6 +51,7 @@ target_link_libraries(FM
     pico_stdlib
     BMP280
     BNO055
+    GPS
     S35
     SD
 )

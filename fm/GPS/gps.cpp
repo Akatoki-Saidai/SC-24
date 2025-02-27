@@ -1,26 +1,12 @@
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <unistd.h>
-#include "error.hpp"
-#include "nema_parser.hpp"
-// #include "SerialConnection.h"
-#include "pico/stdlib.h"
-#include "hardware/uart.h"
-
-
-#define UART_ID uart0
-#define BAUD_RATE 38400  // ビットレートこれだっけ？
-#define DATA_BITS 8
-#define STOP_BITS 1
-#define PARITY    UART_PARITY_NONE
-
-#define UART_TX_PIN 0
-#define UART_RX_PIN 1
+#include "gps.hpp"
 
 // static int chars_rxed = 0;
 
 char uart_buffer_temp[512];
+
+std::pair<double,double> GPS::read() const {
+
+}
 
 // RX interrupt handler
 /*  割り込み無効化
@@ -38,6 +24,7 @@ void on_uart_rx() {
     }
 }
 */
+
 
 int Serial_receive(char *buffer, size_t length) {
     size_t count = 0;

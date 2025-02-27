@@ -99,11 +99,7 @@ std::pair<double, double> Rotation_clockwise_xy(std::pair<double, double> vec_xy
     return {new_vector_x, new_vector_y};
 }
 
-/*****************  コンパイルを通すために仮でおいておきます *****************************/
-class GPS{public: std::pair<double,double> read() const {return {0, 0};}};
-/*************************************************************************************/
-
-void fallphase(BNO055& bno055, const GPS& gps)
+void fall_phase(BMP280& bmp280, BNO055& bno055, const GPS& gps)
 {
     //------ちゃんと動くか確認するためのコード-----
     // std::vector<float> mag_vector = {0.0,0.0,0.0};
