@@ -17,7 +17,9 @@ int main()
     printf("init_ok\n");
 
     S35 s35_left(18,50);//左のサーボ
-    S35 s35_right(18,50);//右のサーボ
+    s35_left.start();
+    // S35 s35_right(18,50);//右のサーボ
+
 
     //I2Cのセットアップ
     i2c_inst_t* const i2c_port = i2c1;
@@ -45,17 +47,27 @@ int main()
     //                        loop                        //
     // ************************************************** //
     while (true) {
-        switch (phase) {
-            case Phase::Wait:
-                wait_phase(bmp280, bno055);
-                break;
-            case Phase::Fall:
-                fall_phase(bmp280, bno055, gps);
-                break;
-            case Phase::Goal:
-                // goal_phase();
-                break;
-        }
+        bmp280.read();
+        bno055.read();
+        s35_left.left_turn();
+        sleep_ms(1000);
+        
+        bmp280.read();
+        bno055.read();
+        s35_left.right_turn();
+        sleep_ms(1000);
+
+        // switch (phase) {
+        //     case Phase::Wait:
+        //         wait_phase(bmp280, bno055);
+        //         break;
+        //     case Phase::Fall:
+        //         fall_phase(bmp280, bno055, gps);
+        //         break;
+        //     case Phase::Goal:
+        //         // goal_phase();
+        //         break;
+        // }
 
     }
 }
