@@ -1,6 +1,6 @@
 #include "fm.hpp"
 #include <math.h>
-// #include "pico/stdlib.h"
+#include "pico/stdlib.h"
 #include <vector>
 #include <cmath>
 #include <array>
@@ -103,7 +103,7 @@ std::pair<double, double> Rotation_clockwise_xy(std::pair<double, double> vec_xy
 class GPS{public: std::pair<double,double> read() const {return {0, 0};}};
 /*************************************************************************************/
 
-void fallfase(BNO055& bno055, const GPS& gps)
+void fallphase(BNO055& bno055, const GPS& gps)
 {
     //------ちゃんと動くか確認するためのコード-----
     // std::vector<float> mag_vector = {0.0,0.0,0.0};
@@ -156,20 +156,25 @@ void fallfase(BNO055& bno055, const GPS& gps)
             s35_left.left_turn();
             sleep_ms(2000);
             right_count = right_count - 1;
-        }else{
+        }else if(right_count<basic_right_count){
             s35_left.right_turn();
             sleep_ms(2000);
             right_count = right_count + 1;
+        }else{
+            break;
         }
         if (left_count>basic_left_count)
         {
             s35_right.right_turn();
             sleep_ms(2000);
             left_count = left_count - 1;
-        }else{
+        }else if(left_count<basic_left_count){
             s35_right.right_turn();
             sleep_ms(2000);
             left_count = left_count + 1;
+        }
+        else{
+            break;
         }
     }else if(North_angle_cansat_basis>(-1*M_PI/4)){
         basic_right_count = 0;
@@ -178,46 +183,54 @@ void fallfase(BNO055& bno055, const GPS& gps)
             s35_left.left_turn();
             sleep_ms(2000);
             right_count = right_count - 1;
-        }else{
+        }else if(){right_count<basic_right_count
             s35_left.right_turn();
             sleep_ms(2000);
             right_count = right_count + 1;
+        }else{
+            break;
         }
         if (left_count>basic_left_count)
         {
             s35_right.right_turn();
             sleep_ms(2000);
             left_count = left_count - 1;
-        }else{
+        }else if(left_count<basic_left_count){
             s35_right.right_turn();
             sleep_ms(2000);
             left_count = left_count + 1;
+        }else{
+            break;
         }
     }
 
 
     if ((3*M_PI/4) <= goal_angle_cansat_basis && goal_angle_cansat_basis < (5*M_PI/4))//正面にゴールがある時の指示
     {
-        while (right_count!=0 && left_count!=0)//もう巻き取っている場合はより戻して左右均等にする。
+        while (right_count!= basic_right_count && left_count!=basic_left_count)//もう巻き取っている場合はより戻して左右均等にする。
         {
             if(right_count>basic_right_count){
                 s35_left.left_turn();
                 sleep_ms(2000);
                 right_count = right_count - 1;
-            }else{
+            }else if(right_count<basic_right_count){
                 s35_left.right_turn();
                 sleep_ms(2000);
                 right_count = right_count + 1;
+            }else{
+                break;
             }
             if (left_count>basic_left_count)
             {
                 s35_right.right_turn();
                 sleep_ms(2000);
                 left_count = left_count - 1;
-            }else{
+            }else if(left_count<basic_left_count){
                 s35_right.right_turn();
                 sleep_ms(2000);
                 left_count = left_count + 1;
+            }else{
+                break;
             }
         }
     }else if((1*M_PI/4) <= goal_angle_cansat_basis && goal_angle_cansat_basis < (3*M_PI/4))//右にゴールがあるときの指示
