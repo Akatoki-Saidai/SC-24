@@ -29,7 +29,7 @@ private:
     std::vector<double> mag_vector;   // magnetometer registers
     int16_t magX, magY, magZ;
     double d_magX, d_magY, d_magZ;
-    uint8_t mag_val = 0x0E; //MAG_DATA_XLSB 0x0E
+    const uint8_t mag_val = 0x0E; //MAG_DATA_XLSB 0x0E
 
     // //ジャイロセンサ
     // uint8_t gyro[6];
@@ -41,13 +41,13 @@ private:
     std::vector<double> grv_vector;
     int16_t grvX, grvY, grvZ;
     double d_grvX, d_grvY, d_grvZ;
-    uint8_t grv_val = 0x2E; //GRV_DATA_X_LSB 0x2E
+    const uint8_t grv_val = 0x2E; //GRV_DATA_X_LSB 0x2E
 
     //加速度
     std::vector<double> accel_vector;
     int16_t accelX, accelY, accelZ;
     double d_accelX, d_accelY, d_accelZ;
-    uint8_t accel_val = 0x28; //LIA_DATA_X_LSB 0x28
+    const uint8_t accel_val = 0x28; //LIA_DATA_X_LSB 0x28
 };
 
 #endif

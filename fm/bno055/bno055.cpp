@@ -5,7 +5,7 @@
 BNO055::BNO055(void){
     // 接続が正常か確かめる
     sleep_ms(1000);
-    uint8_t reg = 0x00;
+    const uint8_t reg = 0x00;
     uint8_t chipID[1];
     i2c_write_blocking(i2c_port, addr, &reg, 1, true);
     i2c_read_blocking(i2c_port, addr, chipID, 1, false);
