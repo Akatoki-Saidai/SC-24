@@ -1,10 +1,4 @@
-#include "fm.hpp"
-#include <math.h>
-#include "pico/stdlib.h"
-#include <vector>
-#include <cmath>
-#include <array>
-#include <iostream>
+#include "fall_phase.hpp"
 
 S35 s35_left(18,50);//左のサーボ
 S35 s35_right(19,50);//右のサーボ
@@ -99,7 +93,7 @@ std::pair<double, double> Rotation_clockwise_xy(std::pair<double, double> vec_xy
     return {new_vector_x, new_vector_y};
 }
 
-void fallphase(BNO055& bno055, const GPS& gps)
+void fall_phase(BMP280& bmp280, BNO055& bno055, const GPS& gps)
 {
     //------ちゃんと動くか確認するためのコード-----
     // std::vector<float> mag_vector = {0.0,0.0,0.0};
