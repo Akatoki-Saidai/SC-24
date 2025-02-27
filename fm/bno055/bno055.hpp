@@ -1,5 +1,5 @@
-#ifndef BNO055_H
-#define BNO055_H
+#ifndef SC24_FM_BNO055_HPP_
+#define SC24_FM_BNO055_HPP_
 
 #include <tuple>
 #include <vector>
@@ -46,4 +46,4 @@ private:
     static constexpr uint8_t LineAccelVal = 0x28; //LIA_DATA_X_LSB 0x28
 };
 
-#endif
+#endif  // SC24_FM_BNO055_HPP_

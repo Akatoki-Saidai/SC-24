@@ -1,3 +1,6 @@
+#ifndef SC24_FM_GPS_HPP_
+#define SC24_FM_GPS_HPP_
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -24,3 +27,5 @@ class GPS{
 public:
     std::pair<double,double> read() const;
 };
+
+#endif  // SC24_FM_GPS_HPP_

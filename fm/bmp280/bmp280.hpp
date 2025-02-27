@@ -1,3 +1,6 @@
+#ifndef SC24_FM_BMP280_HPP_
+#define SC24_FM_BMP280_HPP_
+
 #include <iostream>
 #include <string>
 #include <tuple>
@@ -44,3 +47,5 @@ private:
     uint16_t _dig_P1;
     int16_t _dig_P2, _dig_P3, _dig_P4, _dig_P5, _dig_P6, _dig_P7, _dig_P8, _dig_P9;
 };
+
+#endif  // SC24_FM_BMP280_HPP_

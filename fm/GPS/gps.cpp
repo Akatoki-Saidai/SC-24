@@ -4,8 +4,9 @@
 
 char uart_buffer_temp[512];
 
+// 仮
 std::pair<double,double> GPS::read() const {
-    //nop
+    return std::make_pair<double, double>(0, 0);
 }
 
 // RX interrupt handler

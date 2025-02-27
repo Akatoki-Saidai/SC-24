@@ -1,5 +1,5 @@
-#ifndef S35_H
-#define S35_H
+#ifndef SC24_FM_S35_HPP_
+#define SC24_FM_S35_HPP_
 
 #include <cmath>
 #include <iostream>
@@ -25,4 +25,4 @@ private:
     int freq;
 };
 
-#endif
+#endif  // SC24_FM_S35_HPP_

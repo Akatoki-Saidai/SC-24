@@ -81,7 +81,7 @@ std::vector<std::vector<double>> BNO055::read(void) {
     double d_line_accelY = line_accelY / 100.00;
     double d_line_accelZ = line_accelZ / 100.00;
 
-    std::vector<double> line_accel_vector({d_line_accelX, d_line_accelY, d_line_accelZ});
+    std::vector<double> line_accel_vector{d_line_accelX, d_line_accelY, d_line_accelZ};
 
     //read gravity data
     uint8_t grv[6];
@@ -96,7 +96,7 @@ std::vector<std::vector<double>> BNO055::read(void) {
     double d_grvY = grvY / 100.00;
     double d_grvZ = grvZ / 100.00;
 
-    std::vector<double> grv_vector({d_grvX, d_grvY, d_grvZ});
+    std::vector<double> grv_vector{d_grvX, d_grvY, d_grvZ};
 
     // Read mag
     uint8_t mag[6];
@@ -110,7 +110,7 @@ std::vector<std::vector<double>> BNO055::read(void) {
     double d_magY = magY / 16.00;
     double d_magZ = magZ / 16.00;
 
-    std::vector<double> mag_vector({d_magX, d_magY, d_magZ});
+    std::vector<double> mag_vector{d_magX, d_magY, d_magZ};
 
     // // Read gyro data
     // i2c_write_blocking(_i2c_port, _i2c_addr, &GyroVal, 1, true);
@@ -123,7 +123,7 @@ std::vector<std::vector<double>> BNO055::read(void) {
     // double d_gyroY = gyroY / 900.00;
     // double d_gyroZ = gyroZ / 900.00;
 
-    // std::vector<double> gyro_vector({d_gyroX, d_gyroY, d_gyroZ});
+    // std::vector<double> gyro_vector{d_gyroX, d_gyroY, d_gyroZ};
 
     return {line_accel_vector, grv_vector, mag_vector};
 }
