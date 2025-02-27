@@ -161,7 +161,7 @@ void fallphase(BNO055& bno055, const GPS& gps)
             sleep_ms(2000);
             right_count = right_count + 1;
         }else{
-            break;
+            return;
         }
         if (left_count>basic_left_count)
         {
@@ -174,7 +174,7 @@ void fallphase(BNO055& bno055, const GPS& gps)
             left_count = left_count + 1;
         }
         else{
-            break;
+            return;
         }
     }else if(North_angle_cansat_basis>(-1*M_PI/4)){
         basic_right_count = 0;
@@ -183,12 +183,12 @@ void fallphase(BNO055& bno055, const GPS& gps)
             s35_left.left_turn();
             sleep_ms(2000);
             right_count = right_count - 1;
-        }else if(){right_count<basic_right_count
+        }else if(right_count<basic_right_count){
             s35_left.right_turn();
             sleep_ms(2000);
             right_count = right_count + 1;
         }else{
-            break;
+            return;
         }
         if (left_count>basic_left_count)
         {
@@ -200,7 +200,7 @@ void fallphase(BNO055& bno055, const GPS& gps)
             sleep_ms(2000);
             left_count = left_count + 1;
         }else{
-            break;
+            return;
         }
     }
 
