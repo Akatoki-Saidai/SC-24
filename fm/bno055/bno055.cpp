@@ -125,5 +125,8 @@ std::vector<std::vector<double>> BNO055::read(void) {
 
     // std::vector<double> gyro_vector{d_gyroX, d_gyroY, d_gyroZ};
 
+    printf("bno055 accel: %f, %f, %f", line_accel_vector[0], line_accel_vector[1], line_accel_vector[2]);
+    printf("bno055 grv: %f, %f, %f", grv_vector[0], grv_vector[1], grv_vector[2]);
+    printf("bno055 mag: %f, %f, %f", mag_vector[0], mag_vector[1], mag_vector[2]);
     return {line_accel_vector, grv_vector, mag_vector};
 }

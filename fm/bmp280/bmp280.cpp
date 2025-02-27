@@ -44,6 +44,7 @@ std::tuple<double, double> BMP280::read() {
     pressure = _compensate_pressure(pressure);
     temperature = _compensate_temp(temperature);
 
+    printf("bmp280 press: %f, temp: %f\n", pressure/100.0, temperature/100.0);
     return std::make_tuple<double, double>(pressure/100.0, temperature/100.0);
 }
 
