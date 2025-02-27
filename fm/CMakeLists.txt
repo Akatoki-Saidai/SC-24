@@ -42,6 +42,7 @@ add_subdirectory(sd_card)
 # 実行ファイルを作成
 add_executable(FM
     fm.cpp
+    wait_phase.cpp
     fall_phase.cpp
 )
 
