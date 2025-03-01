@@ -22,19 +22,36 @@
 // 既にI2Cのセットアップが済んでいることを前提として，BMP280をセットアップ
 BMP280::BMP280(i2c_inst_t* i2c_port, uint8_t i2c_addr):
     _i2c_port(i2c_port), _i2c_addr(i2c_addr) {
+    printf("bmp280 start init\n");
     // stdio_init_all();
     // i2c_init(_i2c_port, 100 * 1000);
     // gpio_set_function(8, GPIO_FUNC_I2C);  // SDAのピン番号を設定
     // gpio_set_function(9, GPIO_FUNC_I2C);  // SCLのピン番号を設定
     // gpio_pull_up(8);
     // gpio_pull_up(9);
+    sleep_ms(100);
+    _write_register(0xE0, 0xB6);
+    sleep_ms(100);
     uint8_t id;
     _read_registers(ChipIdRegister, &id, 1);  // チップIDを読み取り
     printf("bmp280 chip id: 0x%X (0x58 is correct)\n", id);
 
+    // _write_register(0xF4, 0x27);  // オーバーサンプリングと電源モードを設定 (0x27なら気温と気圧を1回ずつ測定，電源モードはNormal)
+    _write_register(0xF4, 0b00101000);  // オーバーサンプリングと電源モードを設定 (0x27なら気温と気圧を1回ずつ測定，電源モードはNormal)
+    // _write_register(0xF5, 0x20);  // 測定間隔とノイズ除去フィルターを設定 (0x20なら62.5ms間隔で，ノイズ除去なし)
+    _write_register(0xF5, 0b00100100);  // 測定間隔とノイズ除去フィルターを設定 (0x20なら62.5ms間隔で，ノイズ除去なし)
+    sleep_ms(100);
     _read_compensation_parameters();  // 補正用データを読み取り
-    _write_register(0xF4, 0x27);  // オーバーサンプリングと電源モードを設定 (0x27なら気温と気圧を1回ずつ測定，電源モードはNormal)
-    _write_register(0xF5, 0x20);  // 測定間隔とノイズ除去フィルターを設定 (0x20なら62.5ms間隔で，ノイズ除去なし)
+
+    // 何回か空測定
+    printf("bmp280 start initial measurement\n");
+    for (int i=0; i<20; ++i) {
+        read();
+        sleep_ms(100);
+    }
+    printf("bmp280 finish initial measurement\n");
+
+    printf("bmp280 finish init\n");
 }
 
 // 気温と気圧を受信
@@ -51,9 +68,10 @@ std::tuple<double, double> BMP280::read() {
 // I2CでBMP280にデータを書き込み
 void BMP280::_write_register(uint8_t reg, uint8_t data) {
     uint8_t buf[2];
-    buf[0] = reg & 0x7f;  // 書き込むレジスタ(メモリ)のアドレス. 最初のビットを0にすることでこの通信が書き込みであることを伝える
+    buf[0] = reg;  // 書き込むレジスタ(メモリ)のアドレス. 最初のビットを0にすることでこの通信が書き込みであることを伝える
+    // buf[0] = reg & 0x7f;  // 書き込むレジスタ(メモリ)のアドレス. 最初のビットを0にすることでこの通信が書き込みであることを伝える
     buf[1] = data;  // 続いて1バイトのデータを送信
-    i2c_write_blocking(_i2c_port, _i2c_addr, buf, 2, true);
+    i2c_write_blocking(_i2c_port, _i2c_addr, buf, 2, false);
 }
 
 // I2CでBMP280からデータを読み込み
@@ -70,6 +88,8 @@ void BMP280::_read_registers(uint8_t reg, uint8_t *buf, uint16_t len) {
 void BMP280::_read_raw(int32_t *pressure, int32_t *temperature) {
     uint8_t buffer[6];
     _read_registers(0xF7, buffer, 6);  // 6バイトの気温と気圧の生データを読み込み
+
+    printf("bmp280 raw: %d, %d, %d, %d, %d, %d\n", buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5]);
     
     // 生データを引数の指すポインタに保存
     *pressure = ((uint32_t) buffer[0] << 12) | ((uint32_t) buffer[1] << 4) | (buffer[2] >> 4);
@@ -134,4 +154,16 @@ void BMP280::_read_compensation_parameters() {
     _dig_P8 = buffer[20] | (buffer[21] << 8);
     _dig_P9 = buffer[22] | (buffer[23] << 8);
 
+    printf("bmp280 params %d %d %d\n", _dig_T1, _dig_T2, _dig_T3);
+    printf("bmp280 params %d, %d, %d, %d, %d, %d, %d, %d, %d\n", _dig_P1, _dig_P2, _dig_P3, _dig_P4, _dig_P5, _dig_P6, _dig_P7, _dig_P8, _dig_P9);
+
+    // dig_H1 = buffer[25];
+
+    // read_registers(0xE1, buffer, 8);
+
+    // dig_H2 = buffer[0] | (buffer[1] << 8);
+    // dig_H3 = (int8_t) buffer[2];
+    // dig_H4 = buffer[3] << 4 | (buffer[4] & 0xf);
+    // dig_H5 = (buffer[5] >> 4) | (buffer[6] << 4);
+    // dig_H6 = (int8_t) buffer[7];
 }

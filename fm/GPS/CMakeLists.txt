@@ -1,6 +1,5 @@
 # ビルドを実行するファイルを追加
 add_library(GPS STATIC
-    ${CMAKE_CURRENT_LIST_DIR}/nema_parser.cpp
     ${CMAKE_CURRENT_LIST_DIR}/gps.cpp
 )
 # 以下の資料を参考にしました
@@ -11,6 +10,7 @@ add_library(GPS STATIC
 target_link_libraries(GPS
     pico_stdlib
     hardware_uart
+    hardware_irq
 )
 
 

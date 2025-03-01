@@ -106,7 +106,7 @@ std::pair<double, double> Rotation_clockwise_xy(std::pair<double, double> vec_xy
     return {new_vector_x, new_vector_y};
 }
 
-void fall_phase(BMP280& bmp280, BNO055& bno055, const GPS& gps)
+void fall_phase(BMP280& bmp280, BNO055& bno055, GPS& gps)
 {
     //------ちゃんと動くか確認するためのコード-----
     // std::vector<float> mag_vector = {0.0,0.0,0.0};
@@ -115,7 +115,8 @@ void fall_phase(BMP280& bmp280, BNO055& bno055, const GPS& gps)
     //-------------------------------------------
     //------本番用のコード------------------------
     std::vector<std::vector<double>> bno_data = bno055.read();//{accel,grv,mag}の順番で入っている想定
-    std::pair<double,double> gps_data_cansat = gps.read();//{lon,lat}で入っている想定
+    auto gps_data = gps.read();
+    std::pair<double,double> gps_data_cansat = {gps_data.lat, gps_data.lon};
     std::pair<double,double> gps_data_goal = {0.0,0.0};//ここは自分で入力
     //-------------------------------------------
 

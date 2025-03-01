@@ -18,7 +18,7 @@ public:
 private:
     i2c_inst_t* const _i2c_port;  // I2Cポート  i2c0かi2c1か
     const uint8_t _i2c_addr;  // I2Cアドレス (センサの電話番号みたいなもの．通信が誰宛かを示す)
-    static constexpr uint8_t DefaultI2cAddr = 0x77;
+    static constexpr uint8_t DefaultI2cAddr = 0x76;
     static constexpr uint8_t ChipIdRegister = 0xd0;
     static constexpr uint8_t ReadBit = 0x80;
     
