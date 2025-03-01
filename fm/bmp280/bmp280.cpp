@@ -36,10 +36,10 @@ BMP280::BMP280(i2c_inst_t* i2c_port, uint8_t i2c_addr):
     _read_registers(ChipIdRegister, &id, 1);  // チップIDを読み取り
     printf("bmp280 chip id: 0x%X (0x58 is correct)\n", id);
 
-    // _write_register(0xF4, 0x27);  // オーバーサンプリングと電源モードを設定 (0x27なら気温と気圧を1回ずつ測定，電源モードはNormal)
-    _write_register(0xF4, 0b00101000);  // オーバーサンプリングと電源モードを設定 (0x27なら気温と気圧を1回ずつ測定，電源モードはNormal)
-    // _write_register(0xF5, 0x20);  // 測定間隔とノイズ除去フィルターを設定 (0x20なら62.5ms間隔で，ノイズ除去なし)
-    _write_register(0xF5, 0b00100100);  // 測定間隔とノイズ除去フィルターを設定 (0x20なら62.5ms間隔で，ノイズ除去なし)
+    _write_register(0xF4, 0x27);  // オーバーサンプリングと電源モードを設定 (0x27なら気温と気圧を1回ずつ測定，電源モードはNormal)
+    // _write_register(0xF4, 0b00101000);  // オーバーサンプリングと電源モードを設定 (0x27なら気温と気圧を1回ずつ測定，電源モードはNormal)
+    _write_register(0xF5, 0x20);  // 測定間隔とノイズ除去フィルターを設定 (0x20なら62.5ms間隔で，ノイズ除去なし)
+    // _write_register(0xF5, 0b00100100);  // 測定間隔とノイズ除去フィルターを設定 (0x20なら62.5ms間隔で，ノイズ除去なし)
     sleep_ms(100);
     _read_compensation_parameters();  // 補正用データを読み取り
 
