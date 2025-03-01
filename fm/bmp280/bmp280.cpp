@@ -68,8 +68,8 @@ std::tuple<double, double> BMP280::read() {
 // I2CでBMP280にデータを書き込み
 void BMP280::_write_register(uint8_t reg, uint8_t data) {
     uint8_t buf[2];
-    buf[0] = reg;  // 書き込むレジスタ(メモリ)のアドレス. 最初のビットを0にすることでこの通信が書き込みであることを伝える
-    // buf[0] = reg & 0x7f;  // 書き込むレジスタ(メモリ)のアドレス. 最初のビットを0にすることでこの通信が書き込みであることを伝える
+    buf[0] = reg;
+    // buf[0] &= 0x7f;  // <==これはSPI通信のときのみ使用します．I2C通信では使用しません！
     buf[1] = data;  // 続いて1バイトのデータを送信
     i2c_write_blocking(_i2c_port, _i2c_addr, buf, 2, false);
 }
@@ -79,7 +79,7 @@ void BMP280::_read_registers(uint8_t reg, uint8_t *buf, uint16_t len) {
     // For this particular device, we send the device the register we want to read
     // first, then subsequently read from the device. The register is auto incrementing
     // so we don't need to keep sending the register we want, just the first.
-    reg = reg | ReadBit;
+    // reg = reg | ReadBit;  // <==これはSPI通信のときのみ使用します．I2C通信では使用しません！
     i2c_write_blocking(_i2c_port, _i2c_addr, &reg, 1, true); 
     i2c_read_blocking(_i2c_port, _i2c_addr, buf, len, false);
 }
