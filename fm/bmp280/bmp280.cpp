@@ -68,7 +68,7 @@ std::tuple<double, double> BMP280::read() {
   humidity = _compensate_humidity(humidity);
 
   printf("bmp280 press: %f, temp: %f, humidith: %f\n", pressure / 100.0,
-         temperature / 100.0, humidith / 1024.0);
+         temperature / 100.0, humidity / 1024.0);
   return std::make_tuple<double, double>(pressure / 100.0, temperature / 100.0);
 }
 
@@ -107,7 +107,7 @@ void BMP280::_read_raw(int32_t *pressure, int32_t *temperature,
               (buffer[2] >> 4);
   *temperature = ((uint32_t)buffer[3] << 12) | ((uint32_t)buffer[4] << 4) |
                  (buffer[5] >> 4);
-  *humidity = (uint32_t)readBuffer[6] << 8 | readBuffer[7];
+  *humidity = (uint32_t)buffer[6] << 8 | buffer[7];
 }
 
 // 補正用データを使用して，生データから気温を計算
@@ -156,9 +156,9 @@ uint32_t BMP280::_compensate_pressure(int32_t adc_P) {
 }
 
 // 補正用データを使用して，生データから湿度を計算
-uint32_t BME280::_compensate_humidity(int32_t adc_H) {
+uint32_t BMP280::_compensate_humidity(int32_t adc_H) {
   int32_t v_x1_u32r;
-  v_x1_u32r = (t_fine - ((int32_t)76800));
+  v_x1_u32r = (_t_fine - ((int32_t)76800));
   v_x1_u32r =
       (((((adc_H << 14) - (((int32_t)dig_H4) << 20) -
           (((int32_t)dig_H5) * v_x1_u32r)) +
@@ -207,7 +207,7 @@ void BMP280::_read_compensation_parameters() {
 
   dig_H1 = buffer[25];
 
-  read_registers(0xE1, buffer, 8);
+  _read_registers(0xE1, buffer, 8);
 
   dig_H2 = buffer[0] | (buffer[1] << 8);
   dig_H3 = (int8_t)buffer[2];

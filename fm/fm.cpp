@@ -69,7 +69,7 @@ int main() {
       //         break;
       // }
     } catch (const std::exception &e) {
-      printf(e.what());
+      printf("%s", e.what());
     }
   }
 }

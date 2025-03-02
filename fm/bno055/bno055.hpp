@@ -17,8 +17,8 @@ public:
 
 private:
   static constexpr uint8_t DefaultI2cAddr = 0x28;
-  const uint8_t _i2c_addr;     // I2Cアドレス
   i2c_inst_t *const _i2c_port; // I2Cポート i2c0かi2c1
+  const uint8_t _i2c_addr;     // I2Cアドレス
 
   // static constexpr uint8_t AccelVal = 0x08; // ACC_DATA_XLSB 0x08
   static constexpr uint8_t MagVal = 0x0E; // MAG_DATA_XLSB 0x0E
