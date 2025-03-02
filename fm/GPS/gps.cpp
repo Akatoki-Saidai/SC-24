@@ -181,7 +181,7 @@ inline void GPS::output_time(std::string &value_str) {
         (value_str.at(4) - '0') * 10 +
         (value_str.at(5) -
          '0'); // 小数形式で与えられるが，.00しか出力されないようなので小数部分は無視する
-    printf("gps_time: %d:%d:%d\n", _measurement.hour, _measurement.minute,
+    printf("gps_time: %02d:%02d:%02d\n", _measurement.hour, _measurement.minute,
            _measurement.second);
   }
 }
@@ -256,7 +256,7 @@ inline void GPS::output_date(std::string &value_str) {
     _measurement.month = (value_str.at(2) - '0') * 10 + (value_str.at(3) - '0');
     _measurement.year =
         2000 + (value_str.at(4) - '0') * 10 + (value_str.at(5) - '0');
-    printf("gps_date: %d-%d-%d\n", _measurement.day, _measurement.month,
+    printf("gps_date: %02d-%02d-%02d\n", _measurement.day, _measurement.month,
            _measurement.year);
   }
 }

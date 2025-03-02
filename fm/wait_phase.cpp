@@ -1,6 +1,6 @@
 #include "wait_phase.hpp"
 
-void wait_phase(BMP280 &bmp280, BNO055 &bno055) {
+void wait_phase(Phase &phase, BMP280 &bmp280, BNO055 &bno055) {
   std::vector<std::vector<double>> bno_data =
       bno055.read(); //{accel,grv,mag}の順番で入っている想定
   double accel_abs =

@@ -1,11 +1,5 @@
 #include "fm.hpp"
 
-enum class Phase {
-  Wait,
-  Fall,
-  Goal,
-};
-
 int main() {
   // ************************************************** //
   //                       setup                        //
@@ -49,25 +43,25 @@ int main() {
   // ************************************************** //
   while (true) {
     try {
-      sleep_ms(2000);
-      bmp280.read();
+      // sleep_ms(2000);
+      // bmp280.read();
       // bno055.read();
       // gps.read();
       // s35_left.left_turn();
       // sleep_ms(2000);
       // s35_left.right_turn();
 
-      // switch (phase) {
-      //     case Phase::Wait:
-      //         wait_phase(bmp280, bno055);
-      //         break;
-      //     case Phase::Fall:
-      //         fall_phase(bmp280, bno055, gps);
-      //         break;
-      //     case Phase::Goal:
-      //         // goal_phase();
-      //         break;
-      // }
+      switch (phase) {
+      case Phase::Wait:
+        wait_phase(phase, bmp280, bno055);
+        break;
+      case Phase::Fall:
+        fall_phase(phase, bmp280, bno055, gps);
+        break;
+      case Phase::Goal:
+        // goal_phase();
+        break;
+      }
     } catch (const std::exception &e) {
       printf("%s", e.what());
     }
