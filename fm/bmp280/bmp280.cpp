@@ -55,6 +55,8 @@ BMP280::BMP280(i2c_inst_t *i2c_port, uint8_t i2c_addr)
     sleep_ms(100);
   }
   printf("bmp280 finish initial measurement\n");
+  //高度0[m]の気圧を保存
+  _set_qnh();
 
   printf("bmp280 finish init\n");
 }

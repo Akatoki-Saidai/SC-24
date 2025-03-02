@@ -3,5 +3,6 @@
 
 #include "fall_phase.hpp"
 #include "wait_phase.hpp"
+#include "goal_phase.hpp"
 
 #endif // SC24_FM_FM_HPP_
