@@ -60,16 +60,42 @@ BMP280::BMP280(i2c_inst_t *i2c_port, uint8_t i2c_addr)
 }
 
 // 気温と気圧を受信
-std::tuple<double, double> BMP280::read() {
+BMP280::Measurement_t BMP280::read() {
   int32_t pressure, temperature, humidity;
   _read_raw(&pressure, &temperature, &humidity);
-  pressure = _compensate_pressure(pressure);
-  temperature = _compensate_temp(temperature);
-  humidity = _compensate_humidity(humidity);
+  double d_pressure, d_tempearture, d_humidity, d_altitude;
+  d_pressure = _compensate_pressure(pressure) / 100.0;
+  d_tempearture = _compensate_temp(temperature) / 100.0;
+  d_humidity = _compensate_humidity(humidity) / 1024.0;
+  d_altitude = _get_altitude(pressure / 100.0);
 
-  printf("bmp280 press: %f, temp: %f, humidith: %f\n", pressure / 100.0,
-         temperature / 100.0, humidity / 1024.0);
-  return std::make_tuple<double, double>(pressure / 100.0, temperature / 100.0);
+  printf("bmp280 press: %f, temp: %f, hum: %f, alt: %f\n", d_pressure,
+         d_tempearture, d_humidity, d_altitude);
+  return {d_pressure, d_tempearture, d_humidity, d_altitude};
+}
+
+double BMP280::_get_altitude(double pressure_hPa) {
+  // 気圧のみを使って高度を算出 (推奨)
+  double altitude =
+      (((1 - (std::pow((pressure_hPa / _qnh), 0.190284))) * 145366.45) /
+       0.3048) /
+      10.0;
+
+  // 気圧と温度を使って高度を算出
+  // (直射日光によるセンサの温度上昇の影響を受けるため非推奨)
+  // double altitude = ((std::pow((_qnh / pressure_hPa), (1.0 / 5.257)) - 1)
+  // *(temperature + 273.15)) / 0.0065;
+  return altitude;
+}
+
+// 高度0m地点の気圧を保存
+void BMP280::_set_qnh() {
+  double pressure_sum = 0.0;
+  constexpr int times = 30;
+  for (int i = 0; i < times; ++i) {
+    pressure_sum += read().pressure;
+  }
+  _qnh = pressure_sum / times;
 }
 
 // I2CでBMP280にデータを書き込み

@@ -1,6 +1,7 @@
 #ifndef SC24_FM_BMP280_HPP_
 #define SC24_FM_BMP280_HPP_
 
+#include <cmath>
 #include <iostream>
 #include <string>
 #include <tuple>
@@ -10,11 +11,18 @@
 
 class BMP280 {
 public:
+  struct Measurement_t {
+    double pressure;
+    double temperature;
+    double humidity;
+    double altitude;
+  };
+
   // 既にI2Cのセットアップが済んでいることを前提として，BMP280をセットアップ
   BMP280(i2c_inst_t *i2c_port = i2c0, uint8_t i2c_addr = DefaultI2cAddr);
 
   // 気温と気圧を受信
-  std::tuple<double, double> read();
+  Measurement_t read();
 
 private:
   i2c_inst_t *const _i2c_port; // I2Cポート  i2c0かi2c1か
@@ -46,6 +54,13 @@ private:
 
   // 補正用データを読み込んで保存
   void _read_compensation_parameters();
+
+  // 気圧から高度を計算
+  double _get_altitude(double pressure_hPa);
+
+  // 高度0m地点の気圧を保存
+  void _set_qnh();
+  double _qnh = 1013.15; // 高度0m地点の気圧 (hPa)
 
   // 補正用データ
   // 気温用
