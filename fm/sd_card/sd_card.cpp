@@ -2,6 +2,10 @@
 
 SD::SD() try {
   try {
+    sleep_ms(1000);
+    sd_init_driver();
+    // time_init();
+
     pSD = sd_get_by_num(0);
 
     fr = f_mount(&pSD->fatfs, pSD->pcName, 1);

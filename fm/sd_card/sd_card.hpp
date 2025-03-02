@@ -18,10 +18,12 @@
 class SD {
   sd_card_t *pSD;
   FRESULT fr;
-  std::string filename_str = std::string("log_") + __DATE__[4] + __DATE__[5] +
-                             '_' + __TIME__[0] + __TIME__[1] + __TIME__[3] +
-                             __TIME__[4] + ".txt";
-  const char *filename = filename_str.c_str();
+  //   std::string filename_str = std::string("log_") + __DATE__[4] +
+  //   __DATE__[5] +
+  //                              '_' + __TIME__[0] + __TIME__[1] + __TIME__[3]
+  //                              +
+  //                              __TIME__[4] + ".txt";
+  const char *filename = "log.txt";
 
 public:
   SD();

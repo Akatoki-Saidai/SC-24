@@ -8,9 +8,25 @@ int main() {
   sleep_ms(2000);
   printf("init_ok\n");
 
+  Flash flash;
+  flash.write(
+      "aiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoai"
+      "ueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiue"
+      "oaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoa"
+      "iueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiu"
+      "eoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueo"
+      "aiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueo");
+  sleep_ms(2000);
+  flash.print();
+  return 0;
+
   // SDカードのセットアップ
   SD sd;
   sleep_ms(1000);
+  printf("write_start\n");
+  sd.write("aiueo");
+  printf("write_end\n");
+  return 0;
 
   Servo servo_l(18, 50); // 左のサーボ
   servo_l.start();
@@ -55,19 +71,19 @@ int main() {
       //   s35_left.left_turn();
       //   sleep_ms(2000);
       //   s35_left.right_turn();
-      //   sd.write("aiueo");
+      sd.write("aiueo");
 
-      switch (phase) {
-      case Phase::Wait:
-        wait_phase(phase, bmp280, bno055);
-        break;
-      case Phase::Fall:
-        fall_phase(phase, bmp280, bno055, gps, servo_r, servo_l);
-        break;
-      case Phase::Goal:
-        goal_phase(phase, bmp280, gps, servo_r, servo_l);
-        break;
-      }
+      //   switch (phase) {
+      //   case Phase::Wait:
+      //     wait_phase(phase, bmp280, bno055);
+      //     break;
+      //   case Phase::Fall:
+      //     fall_phase(phase, bmp280, bno055, gps, servo_r, servo_l);
+      //     break;
+      //   case Phase::Goal:
+      //     goal_phase(phase, bmp280, gps, servo_r, servo_l);
+      //     break;
+      //   }
     } catch (const std::exception &e) {
       printf("%s", e.what());
     }

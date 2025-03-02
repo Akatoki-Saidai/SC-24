@@ -38,6 +38,7 @@ add_subdirectory(bno055)
 add_subdirectory(GPS)
 add_subdirectory(servo)
 add_subdirectory(sd_card)
+add_subdirectory(flash)
 
 # 実行ファイルを作成
 add_executable(FM
@@ -55,6 +56,7 @@ target_link_libraries(FM
     GPS
     Servo
     SD
+    Flash
 )
 
 # USB出力を有効にし，UART出力を無効にする
