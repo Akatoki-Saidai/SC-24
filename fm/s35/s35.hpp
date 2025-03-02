@@ -4,25 +4,24 @@
 #include <cmath>
 #include <iostream>
 
-#include "pico/stdlib.h"
 #include "hardware/gpio.h"
 #include "hardware/pwm.h"
+#include "pico/stdlib.h"
 
-class S35{
+class S35 {
 public:
-    S35(int pin = 18, int freq = 50);//コンストラクタ
-    ~S35();//デストラクタ
+  S35(int pin = 18, int freq = 50); // コンストラクタ
+  ~S35();                           // デストラクタ
 
-    void start();
-    void stop();
-    void left_turn();
-    void right_turn();
-    void stop_turn();
-
+  void start();
+  void stop();
+  void left_turn();
+  void right_turn();
+  void stop_turn();
 
 private:
-    int pin;
-    int freq;
+  int pin;
+  int freq;
 };
 
-#endif  // SC24_FM_S35_HPP_
+#endif // SC24_FM_S35_HPP_

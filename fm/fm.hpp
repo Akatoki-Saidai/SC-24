@@ -4,4 +4,4 @@
 #include "fall_phase.hpp"
 #include "wait_phase.hpp"
 
-#endif  // SC24_FM_FM_HPP_
+#endif // SC24_FM_FM_HPP_
