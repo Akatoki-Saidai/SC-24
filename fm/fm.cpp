@@ -8,6 +8,10 @@ int main() {
   sleep_ms(2000);
   printf("init_ok\n");
 
+  // SDカードのセットアップ
+  SD sd;
+  sleep_ms(1000);
+
   S35 s35_left(18, 50); // 左のサーボ
   s35_left.start();
   // S35 s35_right(18,50);//右のサーボ
@@ -43,25 +47,26 @@ int main() {
   // ************************************************** //
   while (true) {
     try {
-      // sleep_ms(2000);
+      sleep_ms(2000);
       // bmp280.read();
       // bno055.read();
       // gps.read();
       // s35_left.left_turn();
       // sleep_ms(2000);
       // s35_left.right_turn();
+      sd.write("aiueo");
 
-      switch (phase) {
-      case Phase::Wait:
-        wait_phase(phase, bmp280, bno055);
-        break;
-      case Phase::Fall:
-        fall_phase(phase, bmp280, bno055, gps);
-        break;
-      case Phase::Goal:
-        // goal_phase();
-        break;
-      }
+      //   switch (phase) {
+      //   case Phase::Wait:
+      //     wait_phase(phase, bmp280, bno055);
+      //     break;
+      //   case Phase::Fall:
+      //     fall_phase(phase, bmp280, bno055, gps);
+      //     break;
+      //   case Phase::Goal:
+      //     goal_phase();
+      //     break;
+      //   }
     } catch (const std::exception &e) {
       printf("%s", e.what());
     }
