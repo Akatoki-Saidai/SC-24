@@ -51,7 +51,7 @@ void Flash::write(std::string write_mesage) {
       }
 
       _write_data.fill(0U);
-      _write_data.at(0) = *(write_binary.data() + 0);
+      _write_data.at(0) = *(write_binary.data() + i);
       _write_index = 0;
     }
     ++_write_index;
