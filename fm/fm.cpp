@@ -59,7 +59,7 @@ int main() {
         fall_phase(phase, bmp280, bno055, gps);
         break;
       case Phase::Goal:
-        // goal_phase();
+        goal_phase(phase, bmp280, gps);
         break;
       }
     } catch (const std::exception &e) {
