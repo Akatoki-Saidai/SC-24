@@ -1,10 +1,10 @@
-#include "s35.hpp"
+#include "servo.hpp"
 
-S35::S35(int pin, int freq) : pin(pin), freq(freq) {}
+Servo::Servo(int pin, int freq) : pin(pin), freq(freq) {}
 
-S35::~S35() { stop(); }
+Servo::~Servo() { stop(); }
 
-void S35::start() {
+void Servo::start() const {
   // gpio_init(pin);               // ピンの初期化
   // gpio_set_dir(pin, GPIO_OUT);  // 出力ピンとして設定
 
@@ -22,7 +22,7 @@ void S35::start() {
   //  1周期の秒数 = ((ラップ + 1) * 分周比) / 125000000
 }
 
-void S35::stop() {
+void Servo::stop() const {
   uint slice_num = pwm_gpio_to_slice_num(pin);
   pwm_set_enabled(slice_num, false); // PWMを無効化
   gpio_set_dir(pin, GPIO_IN);        // ピンを入力に設定
@@ -32,7 +32,7 @@ void S35::stop() {
 // 参考：https://raspberry.memo.wiki/d/PWM%C0%A9%B8%E6
 // デューティサイクルの時に出てくる65535は16bitの最大値。picoのpwmが16bitのカウンタを使用してるらしい
 
-void S35::left_turn() {
+void Servo::left_turn() const {
   // パルス幅を設定(1000[us]~2000[us]で動作するらしい)
   double pulse_width = 2000; //[us]
 
@@ -47,7 +47,7 @@ void S35::left_turn() {
   pwm_set_gpio_level(pin, duty_cycle); // 正規化されたデューティサイクル
 }
 
-void S35::right_turn() {
+void Servo::right_turn() const {
 
   // パルス幅を設定(1000[us]~2000[us]で動作するらしい)
   double pulse_width = 1000; //[us]
@@ -62,7 +62,7 @@ void S35::right_turn() {
   pwm_set_gpio_level(pin, duty_cycle); // 正規化されたデューティサイクル
 }
 
-void S35::stop_turn() {
+void Servo::stop_turn() const {
 
   // パルス幅を設定(1000[us]~2000[us]で動作するらしい)
   double pulse_width = 1500; //[us]

@@ -13,8 +13,8 @@
 #include "bmp280/bmp280.hpp"
 #include "bno055/bno055.hpp"
 #include "phase.hpp"
-#include "s35/s35.hpp"
 #include "sd_card/sd_card.hpp"
+#include "servo/servo.hpp"
 
 void wait_phase(Phase &phase, BMP280 &bmp280, const BNO055 &bno055);
 

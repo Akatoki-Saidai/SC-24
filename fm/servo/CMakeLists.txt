@@ -1,13 +1,13 @@
 # ビルドを実行するファイルを追加
-add_library(S35 STATIC
-    ${CMAKE_CURRENT_LIST_DIR}/s35.cpp
+add_library(Servo STATIC
+    ${CMAKE_CURRENT_LIST_DIR}/servo.cpp
 )
 # 以下の資料を参考にしました
 # https://qiita.com/kikochan/items/732e46e92e7f29c18ce9
 # https://qiita.com/shohirose/items/45fb49c6b429e8b204ac
 
 # ライブラリの読み込み
-target_link_libraries(S35
+target_link_libraries(Servo
     pico_stdlib
     hardware_gpio
     hardware_pwm 
@@ -34,9 +34,7 @@ target_link_libraries(S35
 
 # # ソースコードのファイルを指定
 # add_executable(test_project
-#     s35_main.cpp
-#     s35.cpp
-#     s35.hpp
+#     servo.cpp
 # )
 
 # # Pico SDKのライブラリとリンク

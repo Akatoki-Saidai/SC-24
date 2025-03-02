@@ -1,9 +1,6 @@
 #include "fall_phase.hpp"
 #include <cmath>
 
-S35 s35_left(18, 50);  // 左のサーボ
-S35 s35_right(19, 50); // 右のサーボ
-
 // どれだけ巻いたかを記録するための変数
 int right_count = 0; // 右に曲がった時のカウント
 int left_count = 0;  // 左に曲がった時のカウント
@@ -119,7 +116,8 @@ Rotation_clockwise_xy(std::pair<double, double> vec_xy, double radian) {
   return {new_vector_x, new_vector_y};
 }
 
-void fall_phase(Phase &phase, BMP280 &bmp280, const BNO055 &bno055, GPS &gps) {
+void fall_phase(Phase &phase, BMP280 &bmp280, const BNO055 &bno055, GPS &gps,
+                const Servo &servo_r, const Servo &servo_l) {
   //------ちゃんと動くか確認するためのコード-----
   // std::vector<float> mag_vector = {0.0,0.0,0.0};
   // auto gps_data_goal = {0.0,0.0};//{lon,lat}で入っている想定
@@ -171,117 +169,6 @@ void fall_phase(Phase &phase, BMP280 &bmp280, const BNO055 &bno055, GPS &gps) {
   // 角度から指示を出す。
 
   // 要変更！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
-  // 加速度(進行方向)考慮ver---------------------------------------------------
-  //  //加速度の方向
-  //  std::pair<double, double> forward_accel = {bno_data[0][0],bno_data[0][1]};
-  //  std::pair<double, double> forward_accel_goal_basis =
-  //  Rotation_clockwise_xy(forward_accel,goal_angle_cansat_basis); double
-  //  accel_angle_goal_basis =
-  //  atan2(forward_accel_goal_basis[1],forward_accel_goal_basis[0]);
-  //  if(accel_angle_goal_basis>(M_PI/4)){
-  //      basic_right_count = 1;
-  //      basic_left_count = 0;
-  //      if(right_count>basic_right_count){
-  //          s35_left.left_turn();
-  //          sleep_ms(2000);
-  //          right_count = right_count - 1;
-  //      }else if(right_count<basic_right_count){
-  //          s35_left.right_turn();
-  //          sleep_ms(2000);
-  //          right_count = right_count + 1;
-  //      }else{
-  //          break;
-  //      }
-  //      if (left_count>basic_left_count)
-  //      {
-  //          s35_right.right_turn();
-  //          sleep_ms(2000);
-  //          left_count = left_count - 1;
-  //      }else if(left_count<basic_left_count){
-  //          s35_right.right_turn();
-  //          sleep_ms(2000);
-  //          left_count = left_count + 1;
-  //      }
-  //      else{
-  //          break;
-  //      }
-  //  }else if(accel_angle_goal_basis>(-1*M_PI/4)){
-  //      basic_right_count = 0;
-  //      basic_left_count = 1;
-  //      if(right_count>basic_right_count){
-  //          s35_left.left_turn();
-  //          sleep_ms(2000);
-  //          right_count = right_count - 1;
-  //      }else if(){right_count<basic_right_count
-  //          s35_left.right_turn();
-  //          sleep_ms(2000);
-  //          right_count = right_count + 1;
-  //      }else{
-  //          break;
-  //      }
-  //      if (left_count>basic_left_count)
-  //      {
-  //          s35_right.right_turn();
-  //          sleep_ms(2000);
-  //          left_count = left_count - 1;
-  //      }else if(left_count<basic_left_count){
-  //          s35_right.right_turn();
-  //          sleep_ms(2000);
-  //          left_count = left_count + 1;
-  //      }else{
-  //          break;
-  //      }
-  //  }
-
-  // if ((3*M_PI/4) <= goal_angle_cansat_basis && goal_angle_cansat_basis <
-  // (5*M_PI/4))//正面にゴールがある時の指示
-  // {
-  //     while (right_count!= basic_right_count &&
-  //     left_count!=basic_left_count)//もう巻き取っている場合はより戻して左右均等にする。
-  //     {
-  //         if(right_count>basic_right_count){
-  //             s35_left.left_turn();
-  //             sleep_ms(2000);
-  //             right_count = right_count - 1;
-  //         }else if(right_count<basic_right_count){
-  //             s35_left.right_turn();
-  //             sleep_ms(2000);
-  //             right_count = right_count + 1;
-  //         }else{
-  //             break;
-  //         }
-  //         if (left_count>basic_left_count)
-  //         {
-  //             s35_right.right_turn();
-  //             sleep_ms(2000);
-  //             left_count = left_count - 1;
-  //         }else if(left_count<basic_left_count){
-  //             s35_right.right_turn();
-  //             sleep_ms(2000);
-  //             left_count = left_count + 1;
-  //         }else{
-  //             break;
-  //         }
-  //     }
-  // }else if((1*M_PI/4) <= goal_angle_cansat_basis && goal_angle_cansat_basis <
-  // (3*M_PI/4))//右にゴールがあるときの指示
-  // {
-  //     s35_left.right_turn();
-  //     sleep_ms(2000);
-  //     right_count = right_count + 1;
-  // }else if((5*M_PI/4) <= goal_angle_cansat_basis && goal_angle_cansat_basis <
-  // (7*M_PI/4))//左にゴールがあるときの指示
-  // {
-  //     s35_right.left_turn();
-  //     sleep_ms(2000);
-  //     left_count = left_count + 1;
-  // }else if(goal_angle_cansat_basis < (1*M_PI/4)||(7*M_PI/4) <=
-  // goal_angle_cansat_basis)//後ろにゴールがあるときの指示
-  // {
-  //     s35_left.right_turn();
-  //     sleep_ms(4000);
-  //     right_count = right_count + 2;
-  // }
 
   // 遠距離フェーズもどきver---------------------------------------------------
   if ((3 * M_PI / 4) <= goal_angle_cansat_basis &&
@@ -292,39 +179,162 @@ void fall_phase(Phase &phase, BMP280 &bmp280, const BNO055 &bno055, GPS &gps) {
                0) // もう巻き取っている場合はより戻して左右均等にする。
     {
       if (right_count > 0) {
-        s35_left.left_turn();
+        servo_l.left_turn();
         sleep_ms(2000);
         right_count = right_count - 1;
+        servo_l.stop_turn();
       }
       if (left_count > 0) {
-        s35_right.right_turn();
+        servo_r.right_turn();
         sleep_ms(2000);
         left_count = left_count - 1;
+        servo_r.stop_turn();
       }
     }
   } else if ((1 * M_PI / 4) <= goal_angle_cansat_basis &&
              goal_angle_cansat_basis <
                  (3 * M_PI / 4)) // 右にゴールがあるときの指示
   {
-    s35_left.right_turn();
+    servo_l.right_turn();
     sleep_ms(2000);
     right_count = right_count + 1;
+    servo_l.stop_turn();
+
   } else if ((5 * M_PI / 4) <= goal_angle_cansat_basis &&
              goal_angle_cansat_basis <
                  (7 * M_PI / 4)) // 左にゴールがあるときの指示
   {
-    s35_right.left_turn();
+    servo_r.left_turn();
     sleep_ms(2000);
     left_count = left_count + 1;
+    servo_r.stop_turn();
+
   } else if (goal_angle_cansat_basis < (1 * M_PI / 4) ||
              (7 * M_PI / 4) <=
                  goal_angle_cansat_basis) // 後ろにゴールがあるときの指示
   {
-    s35_left.right_turn();
+    servo_l.right_turn();
     sleep_ms(4000);
     right_count = right_count + 2;
+    servo_l.stop_turn();
+  }
+
+  if (distance < 15) {
+    phase = Phase::Goal;
   }
 }
+
+// 加速度(進行方向)考慮ver---------------------------------------------------
+//  //加速度の方向
+//  std::pair<double, double> forward_accel = {bno_data[0][0],bno_data[0][1]};
+//  std::pair<double, double> forward_accel_goal_basis =
+//  Rotation_clockwise_xy(forward_accel,goal_angle_cansat_basis); double
+//  accel_angle_goal_basis =
+//  atan2(forward_accel_goal_basis[1],forward_accel_goal_basis[0]);
+//  if(accel_angle_goal_basis>(M_PI/4)){
+//      basic_right_count = 1;
+//      basic_left_count = 0;
+//      if(right_count>basic_right_count){
+//          s35_left.left_turn();
+//          sleep_ms(2000);
+//          right_count = right_count - 1;
+//      }else if(right_count<basic_right_count){
+//          s35_left.right_turn();
+//          sleep_ms(2000);
+//          right_count = right_count + 1;
+//      }else{
+//          break;
+//      }
+//      if (left_count>basic_left_count)
+//      {
+//          s35_right.right_turn();
+//          sleep_ms(2000);
+//          left_count = left_count - 1;
+//      }else if(left_count<basic_left_count){
+//          s35_right.right_turn();
+//          sleep_ms(2000);
+//          left_count = left_count + 1;
+//      }
+//      else{
+//          break;
+//      }
+//  }else if(accel_angle_goal_basis>(-1*M_PI/4)){
+//      basic_right_count = 0;
+//      basic_left_count = 1;
+//      if(right_count>basic_right_count){
+//          s35_left.left_turn();
+//          sleep_ms(2000);
+//          right_count = right_count - 1;
+//      }else if(){right_count<basic_right_count
+//          s35_left.right_turn();
+//          sleep_ms(2000);
+//          right_count = right_count + 1;
+//      }else{
+//          break;
+//      }
+//      if (left_count>basic_left_count)
+//      {
+//          s35_right.right_turn();
+//          sleep_ms(2000);
+//          left_count = left_count - 1;
+//      }else if(left_count<basic_left_count){
+//          s35_right.right_turn();
+//          sleep_ms(2000);
+//          left_count = left_count + 1;
+//      }else{
+//          break;
+//      }
+//  }
+
+// if ((3*M_PI/4) <= goal_angle_cansat_basis && goal_angle_cansat_basis <
+// (5*M_PI/4))//正面にゴールがある時の指示
+// {
+//     while (right_count!= basic_right_count &&
+//     left_count!=basic_left_count)//もう巻き取っている場合はより戻して左右均等にする。
+//     {
+//         if(right_count>basic_right_count){
+//             s35_left.left_turn();
+//             sleep_ms(2000);
+//             right_count = right_count - 1;
+//         }else if(right_count<basic_right_count){
+//             s35_left.right_turn();
+//             sleep_ms(2000);
+//             right_count = right_count + 1;
+//         }else{
+//             break;
+//         }
+//         if (left_count>basic_left_count)
+//         {
+//             s35_right.right_turn();
+//             sleep_ms(2000);
+//             left_count = left_count - 1;
+//         }else if(left_count<basic_left_count){
+//             s35_right.right_turn();
+//             sleep_ms(2000);
+//             left_count = left_count + 1;
+//         }else{
+//             break;
+//         }
+//     }
+// }else if((1*M_PI/4) <= goal_angle_cansat_basis && goal_angle_cansat_basis <
+// (3*M_PI/4))//右にゴールがあるときの指示
+// {
+//     s35_left.right_turn();
+//     sleep_ms(2000);
+//     right_count = right_count + 1;
+// }else if((5*M_PI/4) <= goal_angle_cansat_basis && goal_angle_cansat_basis <
+// (7*M_PI/4))//左にゴールがあるときの指示
+// {
+//     s35_right.left_turn();
+//     sleep_ms(2000);
+//     left_count = left_count + 1;
+// }else if(goal_angle_cansat_basis < (1*M_PI/4)||(7*M_PI/4) <=
+// goal_angle_cansat_basis)//後ろにゴールがあるときの指示
+// {
+//     s35_left.right_turn();
+//     sleep_ms(4000);
+//     right_count = right_count + 2;
+// }
 
 // 自分で書いたはいいものの、自信がなくなって没になった関数たちの墓場
 

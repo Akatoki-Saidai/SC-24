@@ -36,7 +36,7 @@ pico_sdk_init()
 add_subdirectory(bmp280)
 add_subdirectory(bno055)
 add_subdirectory(GPS)
-add_subdirectory(s35)
+add_subdirectory(servo)
 add_subdirectory(sd_card)
 
 # 実行ファイルを作成
@@ -44,6 +44,7 @@ add_executable(FM
     fm.cpp
     wait_phase.cpp
     fall_phase.cpp
+    goal_phase.cpp
 )
 
 # コンパイルする際にライブラリをリンク
@@ -52,7 +53,7 @@ target_link_libraries(FM
     BMP280
     BNO055
     GPS
-    S35
+    Servo
     SD
 )
 

@@ -12,9 +12,10 @@ int main() {
   SD sd;
   sleep_ms(1000);
 
-  S35 s35_left(18, 50); // 左のサーボ
-  s35_left.start();
-  // S35 s35_right(18,50);//右のサーボ
+  Servo servo_l(18, 50); // 左のサーボ
+  servo_l.start();
+  Servo servo_r(18, 50); // 右のサーボ
+  servo_r.start();
 
   // I2Cのセットアップ
   i2c_inst_t *const i2c_port = i2c1;
@@ -48,25 +49,25 @@ int main() {
   while (true) {
     try {
       sleep_ms(2000);
-      // bmp280.read();
-      // bno055.read();
-      // gps.read();
-      // s35_left.left_turn();
-      // sleep_ms(2000);
-      // s35_left.right_turn();
-      sd.write("aiueo");
+      //   bmp280.read();
+      //   bno055.read();
+      //   gps.read();
+      //   s35_left.left_turn();
+      //   sleep_ms(2000);
+      //   s35_left.right_turn();
+      //   sd.write("aiueo");
 
-      //   switch (phase) {
-      //   case Phase::Wait:
-      //     wait_phase(phase, bmp280, bno055);
-      //     break;
-      //   case Phase::Fall:
-      //     fall_phase(phase, bmp280, bno055, gps);
-      //     break;
-      //   case Phase::Goal:
-      //     goal_phase();
-      //     break;
-      //   }
+      switch (phase) {
+      case Phase::Wait:
+        wait_phase(phase, bmp280, bno055);
+        break;
+      case Phase::Fall:
+        fall_phase(phase, bmp280, bno055, gps, servo_r, servo_l);
+        break;
+      case Phase::Goal:
+        goal_phase(phase, bmp280, gps, servo_r, servo_l);
+        break;
+      }
     } catch (const std::exception &e) {
       printf("%s", e.what());
     }
