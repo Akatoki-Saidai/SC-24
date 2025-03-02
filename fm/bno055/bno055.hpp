@@ -9,11 +9,17 @@
 #include "pico/stdlib.h"
 
 class BNO055 {
+  struct Measurement_t {
+    std::vector<double> accel;
+    std::vector<double> mag;
+    std::vector<double> grav;
+  };
+
 public:
   BNO055(i2c_inst_t *i2c_port = i2c0,
          uint8_t i2c_addr = DefaultI2cAddr); // コンストラクタ
   ~BNO055();                                 // デストラクタ
-  std::vector<std::vector<double>> read() const;
+  Measurement_t read() const;
 
 private:
   static constexpr uint8_t DefaultI2cAddr = 0x28;

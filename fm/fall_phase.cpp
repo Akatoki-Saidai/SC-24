@@ -126,8 +126,7 @@ void fall_phase(Phase &phase, BMP280 &bmp280, const BNO055 &bno055, GPS &gps) {
   // auto gps_data_cansat = {0.0,0.0};
   //-------------------------------------------
   //------本番用のコード------------------------
-  std::vector<std::vector<double>> bno_data =
-      bno055.read(); //{accel,grv,mag}の順番で入っている想定
+  auto bno_data = bno055.read(); //{accel,grv,mag}の順番で入っている想定
   auto gps_data = gps.read();
   std::pair<double, double> gps_data_cansat = {gps_data.lat, gps_data.lon};
   std::pair<double, double> gps_data_goal = {0.0, 0.0}; // ここは自分で入力
@@ -139,7 +138,7 @@ void fall_phase(Phase &phase, BMP280 &bmp280, const BNO055 &bno055, GPS &gps) {
   double c_lon = std::get<0>(gps_data_cansat); // 自分の経度
   double c_lat = std::get<1>(gps_data_cansat); // 自分の緯度
   std::pair<double, double> North_xy = {
-      bno_data[2][0], bno_data[2][1]}; // cansatから見た北の方向(xy平面)
+      bno_data.accel[0], bno_data.accel[1]}; // cansatから見た北の方向(xy平面)
   std::pair<double, double> Cansat_forward_xy = {
       1.0,
       0.0}; // 正面をx軸の方としている(これはbnoの向き次第、違ったら適宜変更)
