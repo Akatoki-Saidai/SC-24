@@ -26,22 +26,23 @@ private:
   // これはSPI通信で使用します．I2C通信では使用しません
 
   // I2CでBMP280にデータを書き込み
-  void _write_register(uint8_t reg, uint8_t data);
+  void _write_register(uint8_t reg, uint8_t data) const;
 
   // I2CでBMP280からデータを読み込み
-  void _read_registers(uint8_t reg, uint8_t *buf, uint16_t len);
+  void _read_registers(uint8_t reg, uint8_t *buf, uint16_t len) const;
 
   // BMP280から気温と気圧と湿度の生データを読み込み
-  void _read_raw(int32_t *pressure, int32_t *temperature, int32_t *humidity);
+  void _read_raw(int32_t *pressure, int32_t *temperature,
+                 int32_t *humidity) const;
 
   // 補正用データを使用して，生データから気温を計算
   int32_t _compensate_temp(int32_t adc_T);
 
   // 補正用データを使用して，生データから気圧を計算
-  uint32_t _compensate_pressure(int32_t adc_P);
+  uint32_t _compensate_pressure(int32_t adc_P) const;
 
   // 補正用データを使用して，生データから湿度を計算
-  uint32_t _compensate_humidity(int32_t adc_H);
+  uint32_t _compensate_humidity(int32_t adc_H) const;
 
   // 補正用データを読み込んで保存
   void _read_compensation_parameters();

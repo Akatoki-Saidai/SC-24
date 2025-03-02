@@ -64,7 +64,7 @@ BNO055::BNO055(i2c_inst_t *i2c_port, uint8_t i2c_addr)
 
 BNO055::~BNO055() {}
 
-std::vector<std::vector<double>> BNO055::read(void) {
+std::vector<std::vector<double>> BNO055::read(void) const {
   // read acceleration data
   uint8_t line_accel[6];
   i2c_write_blocking(_i2c_port, _i2c_addr, &LineAccelVal, 1, true);

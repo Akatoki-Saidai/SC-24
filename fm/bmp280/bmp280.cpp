@@ -73,7 +73,7 @@ std::tuple<double, double> BMP280::read() {
 }
 
 // I2CでBMP280にデータを書き込み
-void BMP280::_write_register(uint8_t reg, uint8_t data) {
+void BMP280::_write_register(uint8_t reg, uint8_t data) const {
   uint8_t buf[2];
   buf[0] = reg;
   // buf[0] &= 0x7f;  //
@@ -83,7 +83,7 @@ void BMP280::_write_register(uint8_t reg, uint8_t data) {
 }
 
 // I2CでBMP280からデータを読み込み
-void BMP280::_read_registers(uint8_t reg, uint8_t *buf, uint16_t len) {
+void BMP280::_read_registers(uint8_t reg, uint8_t *buf, uint16_t len) const {
   // For this particular device, we send the device the register we want to read
   // first, then subsequently read from the device. The register is auto
   // incrementing so we don't need to keep sending the register we want, just
@@ -95,7 +95,7 @@ void BMP280::_read_registers(uint8_t reg, uint8_t *buf, uint16_t len) {
 
 // BMP280から気温と気圧の生データを読み込み
 void BMP280::_read_raw(int32_t *pressure, int32_t *temperature,
-                       int32_t *humidity) {
+                       int32_t *humidity) const {
   uint8_t buffer[8];
   _read_registers(0xF7, buffer, 6); // 6バイトの気温と気圧の生データを読み込み
 
@@ -127,7 +127,7 @@ int32_t BMP280::_compensate_temp(int32_t adc_T) {
 }
 
 // 補正用データを使用して，生データから気圧を計算
-uint32_t BMP280::_compensate_pressure(int32_t adc_P) {
+uint32_t BMP280::_compensate_pressure(int32_t adc_P) const {
   int32_t var1, var2;
   uint32_t p;
   var1 = (((int32_t)_t_fine) >> 1) - (int32_t)64000;
@@ -156,7 +156,7 @@ uint32_t BMP280::_compensate_pressure(int32_t adc_P) {
 }
 
 // 補正用データを使用して，生データから湿度を計算
-uint32_t BMP280::_compensate_humidity(int32_t adc_H) {
+uint32_t BMP280::_compensate_humidity(int32_t adc_H) const {
   int32_t v_x1_u32r;
   v_x1_u32r = (_t_fine - ((int32_t)76800));
   v_x1_u32r =

@@ -16,6 +16,6 @@
 #include "s35/s35.hpp"
 #include "sd_card/sd_card.hpp"
 
-void fall_phase(Phase &phase, BMP280 &bmp280, BNO055 &bno055, GPS &gps);
+void fall_phase(Phase &phase, BMP280 &bmp280, const BNO055 &bno055, GPS &gps);
 
 #endif // SC24_FM_FALL_PHASE_HPP_
