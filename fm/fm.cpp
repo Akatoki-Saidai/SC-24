@@ -9,69 +9,80 @@ int main() {
   printf("init_ok\n");
 
   Flash flash;
-  flash.write(
-      "aiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoai"
-      "ueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiue"
-      "oaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoa"
-      "iueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiu"
-      "eoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueo"
-      "aiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueo");
-  sleep_ms(2000);
-  flash.print();
-  return 0;
+  // flash.write(
+  //     "aiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoai"
+  //     "ueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiue"
+  //     "oaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoa"
+  //     "iueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiu"
+  //     "eoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueo"
+  //     "aiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueoaiueo");
+  // sleep_ms(2000);
+  // flash.print();
+  // return 0;
 
   // SDカードのセットアップ
-  SD sd;
-  sleep_ms(1000);
-  printf("write_start\n");
-  sd.write("aiueo");
-  printf("write_end\n");
-  return 0;
+  // SD sd;
+  // sleep_ms(1000);
+  // printf("write_start\n");
+  // sd.write("aiueo");
+  // printf("write_end\n");
+  // return 0;
 
-  Servo servo_l(18, 50); // 左のサーボ
+  Servo servo_l(26, 50); // 左のサーボ
   servo_l.start();
-  Servo servo_r(18, 50); // 右のサーボ
+  Servo servo_r(27, 50); // 右のサーボ
   servo_r.start();
 
-  // I2Cのセットアップ
-  i2c_inst_t *const i2c_port = i2c1;
-  constexpr uint8_t sda_pin = 14;
-  constexpr uint8_t scl_pin = 15;
-  i2c_init(i2c_port, 400 * 1000);
-  gpio_set_function(sda_pin, GPIO_FUNC_I2C);
-  gpio_set_function(scl_pin, GPIO_FUNC_I2C);
-  gpio_pull_up(sda_pin);
-  gpio_pull_up(scl_pin);
+  // // I2Cのセットアップ
+  // i2c_inst_t *const i2c_port = i2c1;
+  // constexpr uint8_t sda_pin = 14;
+  // constexpr uint8_t scl_pin = 15;
+  // i2c_init(i2c_port, 400 * 1000);
+  // gpio_set_function(sda_pin, GPIO_FUNC_I2C);
+  // gpio_set_function(scl_pin, GPIO_FUNC_I2C);
+  // gpio_pull_up(sda_pin);
+  // gpio_pull_up(scl_pin);
 
-  // BMP280のセットアップ
-  BMP280 bmp280(i2c1);
+  // // BMP280のセットアップ
+  // BMP280 bmp280(i2c1);
 
-  // BNO055のセットアップ
-  BNO055 bno055(i2c1);
+  // // BNO055のセットアップ
+  // BNO055 bno055(i2c1);
 
-  // UARTのセットアップ
-  uart_init(uart0, 38400);
-  gpio_set_function(0, GPIO_FUNC_UART);
-  gpio_set_function(1, GPIO_FUNC_UART);
+  // // UARTのセットアップ
+  // uart_init(uart0, 38400);
+  // gpio_set_function(0, GPIO_FUNC_UART);
+  // gpio_set_function(1, GPIO_FUNC_UART);
 
-  // GPSのセットアップ
-  GPS gps(uart0);
+  // // GPSのセットアップ
+  // GPS gps(uart0);
 
-  Phase phase = Phase::Wait;
+  // Phase phase = Phase::Wait;
 
   // ************************************************** //
   //                        loop                        //
   // ************************************************** //
   while (true) {
     try {
-      sleep_ms(2000);
+      // sleep_ms(5000);
       //   bmp280.read();
       //   bno055.read();
+
       //   gps.read();
-      //   s35_left.left_turn();
-      //   sleep_ms(2000);
-      //   s35_left.right_turn();
-      sd.write("aiueo");
+      servo_l.left_turn();
+      servo_r.left_turn();
+      // gpio_put(9, 1);
+      sleep_ms(2000);
+      servo_l.stop_turn();
+      servo_r.stop_turn();
+      servo_l.right_turn();
+      servo_r.right_turn();
+      sleep_ms(2000);
+      servo_l.stop_turn();
+      servo_r.stop_turn();
+      // return 0;
+      // sd.write("aiueo");
+      // gpio_put(9, 0);
 
       //   switch (phase) {
       //   case Phase::Wait:
