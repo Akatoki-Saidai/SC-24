@@ -1,8 +1,4 @@
-#include <array>
-#include <cmath>
 #include <iostream>
-#include <math.h>
-#include <vector>
 
 #include "pico/stdlib.h"
 
@@ -14,8 +10,6 @@ int main() {
   // ************************************************** //
   stdio_init_all();
   sleep_ms(100);
-  printf("init_ok\n");
-
 
   Servo servo_l(26, 50); // 左のサーボ
   servo_l.start();
@@ -25,27 +19,34 @@ int main() {
   // ピンのセットアップ
   gpio_init(15);
   gpio_init(16);
-  gpio_set_Dir(15. GPIO_IN);
-  gpio_set_Dir(16. GPIO_IN);
+  gpio_set_dir(15, GPIO_IN);
+  gpio_set_dir(16, GPIO_IN);
   gpio_pull_up(15);
   gpio_pull_up(16);
 
+  sleep_ms(1000);
+
+  printf("init_ok\n");
   // ************************************************** //
   //                        loop                        //
   // ************************************************** //
   while (true) {
     try {
-      if (gpio_get(15)) {
-        servo_r.left_turn();
-      } else {
+      uint i1 = gpio_get(15);
+      uint i2 = gpio_get(16);
+      printf("%d, %d\n", i1, i2);
+      if (i1) {
         servo_r.stop_turn();
-      }
-      if (gpio_get(16)) {
-        servo_l.left_turn();
       } else {
-        servo_l.stop_turn();
+        // servo_r.left_turn();
       }
-      sleep_ms(10);
+      sleep_ms(1000);
+      if (i2) {
+        servo_l.stop_turn();
+      } else {
+        // servo_l.left_turn();
+      }
+      sleep_ms(1000);
     } catch (const std::exception &e) {
       printf("%s", e.what());
     }
