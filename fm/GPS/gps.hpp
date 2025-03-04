@@ -10,6 +10,8 @@
 #include "hardware/uart.h"
 #include "pico/stdlib.h"
 
+#include "../flash/flash.hpp"
+
 class GPS {
 private:
   uart_inst_t *_uart_hw;
@@ -22,7 +24,7 @@ private:
   const uint _read_len = 800;
 
 public:
-  GPS(uart_inst_t *uart_hw);
+  GPS(uart_inst_t *uart_hw, Flash flash = Flash(nullptr));
 
   struct Measurement_t {
     double lat = -1024.0;

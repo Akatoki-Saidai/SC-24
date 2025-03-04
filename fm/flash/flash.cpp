@@ -1,6 +1,6 @@
 #include "flash.hpp"
 
-Flash::Flash() try {
+Flash::Flash() try : _enable(true) {
   try {
   } catch (const std::exception &e) {
     printf("\n********************\n\n<<!! INIT ERRPR !!>> in %s line "
@@ -12,6 +12,10 @@ Flash::Flash() try {
 }
 
 void Flash::clear() {
+  if (_enable == false) {
+    return;
+  }
+
   // 割り込み無効にする
   uint32_t ints = save_and_disable_interrupts();
   // Flash消去。
@@ -25,6 +29,10 @@ void Flash::clear() {
 }
 
 void Flash::write(std::string write_mesage) {
+  if (_enable == false) {
+    return;
+  }
+
   static std::size_t _write_index = 0;
 
   std::basic_string<uint8_t> write_binary(std::begin(write_mesage),
@@ -59,11 +67,19 @@ void Flash::write(std::string write_mesage) {
 }
 
 Flash::~Flash() {
+  if (_enable == false) {
+    return;
+  }
+
   this->write(std::string("\nlog end ") + __DATE__ + __TIME__);
   flash_range_program(_target_offset, _write_data.data(), _write_data.size());
 }
 
 void Flash::print() {
+  if (_enable == false) {
+    return;
+  }
+
   std::cout << "\n#################### Log Data ####################"
             << std::endl;
   for (uint32_t i = _target_begin; i < _target_end; ++i) {

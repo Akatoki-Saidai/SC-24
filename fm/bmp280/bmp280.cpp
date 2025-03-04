@@ -19,7 +19,7 @@
 */
 
 // 既にI2Cのセットアップが済んでいることを前提として，BMP280をセットアップ
-BMP280::BMP280(i2c_inst_t *i2c_port, uint8_t i2c_addr)
+BMP280::BMP280(i2c_inst_t *i2c_port, uint8_t i2c_addr, Flash flash)
     : _i2c_port(i2c_port), _i2c_addr(i2c_addr) {
   printf("bmp280 start init\n");
   // stdio_init_all();
@@ -55,7 +55,7 @@ BMP280::BMP280(i2c_inst_t *i2c_port, uint8_t i2c_addr)
     sleep_ms(100);
   }
   printf("bmp280 finish initial measurement\n");
-  //高度0[m]の気圧を保存
+  // 高度0[m]の気圧を保存
   _set_qnh();
 
   printf("bmp280 finish init\n");

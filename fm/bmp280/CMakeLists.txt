@@ -10,6 +10,7 @@ add_library(BMP280 STATIC
 target_link_libraries(BMP280
     pico_stdlib
     hardware_i2c
+    hardware_flash
 )
 
 

@@ -1,6 +1,6 @@
 #include "servo.hpp"
 
-Servo::Servo(int pin, int freq) : pin(pin), freq(freq) {}
+Servo::Servo(int pin, int freq, Flash flash) : pin(pin), freq(freq) {}
 
 Servo::~Servo() { stop(); }
 

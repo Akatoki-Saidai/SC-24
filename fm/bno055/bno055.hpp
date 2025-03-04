@@ -8,6 +8,8 @@
 #include "hardware/i2c.h"
 #include "pico/stdlib.h"
 
+#include "../flash/flash.hpp"
+
 class BNO055 {
   struct Measurement_t {
     std::vector<double> accel;
@@ -16,9 +18,9 @@ class BNO055 {
   };
 
 public:
-  BNO055(i2c_inst_t *i2c_port = i2c0,
-         uint8_t i2c_addr = DefaultI2cAddr); // コンストラクタ
-  ~BNO055();                                 // デストラクタ
+  BNO055(i2c_inst_t *i2c_port = i2c0, uint8_t i2c_addr = DefaultI2cAddr,
+         Flash flash = Flash(nullptr)); // コンストラクタ
+  ~BNO055();                            // デストラクタ
   Measurement_t read() const;
 
 private:

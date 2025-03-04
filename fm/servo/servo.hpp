@@ -8,10 +8,13 @@
 #include "hardware/pwm.h"
 #include "pico/stdlib.h"
 
+#include "../flash/flash.hpp"
+
 class Servo {
 public:
-  Servo(int pin = 18, int freq = 50); // コンストラクタ
-  ~Servo();                           // デストラクタ
+  Servo(int pin = 18, int freq = 50,
+        Flash flash = Flash(nullptr)); // コンストラクタ
+  ~Servo();                            // デストラクタ
 
   void start() const;
   void stop() const;
@@ -22,6 +25,7 @@ public:
 private:
   int pin;
   int freq;
+  Flash f;
 };
 
 #endif // SC24_FM_S35_HPP_

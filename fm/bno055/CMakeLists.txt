@@ -10,6 +10,7 @@ add_library(BNO055 STATIC
 target_link_libraries(BNO055
     pico_stdlib
     hardware_i2c
+    hardware_flash
 )
 
 

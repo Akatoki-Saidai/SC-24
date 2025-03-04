@@ -11,6 +11,7 @@ target_link_libraries(GPS
     pico_stdlib
     hardware_uart
     hardware_irq
+    hardware_flash
 )
 
 

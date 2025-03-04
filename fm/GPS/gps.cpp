@@ -22,7 +22,7 @@ std::deque<char> recv1;
 void read_raw1();
 } // namespace gps
 
-GPS::GPS(uart_inst_t *uart_hw) : _uart_hw(uart_hw) {
+GPS::GPS(uart_inst_t *uart_hw, Flash flash) : _uart_hw(uart_hw) {
   // uart_init(_uart_hw, baud_rate);
 
   // gpio_set_function(tx_pin, GPIO_FUNC_UART);

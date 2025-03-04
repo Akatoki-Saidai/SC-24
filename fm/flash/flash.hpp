@@ -1,4 +1,8 @@
+#ifndef SC24_FM_FLASH_HPP_
+#define SC24_FM_FLASH_HPP_
+
 #include <array>
+#include <cstddef>
 #include <iostream>
 #include <string>
 
@@ -16,9 +20,14 @@ class Flash {
   uint32_t _target_offset = _target_begin;
   std::array<uint8_t, FLASH_PAGE_SIZE> _write_data;
 
+  const bool _enable;
+
 public:
   //! @brief フラッシュメモリのセットアップ
   Flash();
+
+  //! @brief 無効なオブジェクトを作成
+  Flash(std::nullptr_t null) : _enable(false) {};
 
   //! @brief フラッシュメモリに書き込み
   void write(std::string write_mesage);
@@ -31,3 +40,5 @@ public:
 
   ~Flash();
 };
+
+#endif // SC24_FM_FLASH_HPP_

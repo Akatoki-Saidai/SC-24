@@ -10,7 +10,8 @@ add_library(Servo STATIC
 target_link_libraries(Servo
     pico_stdlib
     hardware_gpio
-    hardware_pwm 
+    hardware_pwm
+    hardware_flash
 )
 
 # # CMake最小バージョン設定

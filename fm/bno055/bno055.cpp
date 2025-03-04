@@ -1,7 +1,7 @@
 #include "bno055.hpp"
 
 // Initialise Accelerometer Function
-BNO055::BNO055(i2c_inst_t *i2c_port, uint8_t i2c_addr)
+BNO055::BNO055(i2c_inst_t *i2c_port, uint8_t i2c_addr, Flash flash)
     : _i2c_port(i2c_port), _i2c_addr(i2c_addr) {
   // 接続が正常か確かめる
   const uint8_t reg = 0x00;

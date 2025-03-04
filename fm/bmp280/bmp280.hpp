@@ -9,17 +9,20 @@
 #include "hardware/i2c.h"
 #include "pico/stdlib.h"
 
+#include "../flash/flash.hpp"
+
 class BMP280 {
 public:
+  // 既にI2Cのセットアップが済んでいることを前提として，BMP280をセットアップ
+  BMP280(i2c_inst_t *i2c_port = i2c0, uint8_t i2c_addr = DefaultI2cAddr,
+         Flash flash = Flash(nullptr));
+
   struct Measurement_t {
     double pressure;
     double temperature;
     double humidity;
     double altitude;
   };
-
-  // 既にI2Cのセットアップが済んでいることを前提として，BMP280をセットアップ
-  BMP280(i2c_inst_t *i2c_port = i2c0, uint8_t i2c_addr = DefaultI2cAddr);
 
   // 気温と気圧を受信
   Measurement_t read();
@@ -32,6 +35,8 @@ private:
   static constexpr uint8_t ChipIdRegister = 0xd0;
   // static constexpr uint8_t ReadBit = 0x80;  //
   // これはSPI通信で使用します．I2C通信では使用しません
+
+  // Flash &_flash; // 出力用のフラッシュメモリ
 
   // I2CでBMP280にデータを書き込み
   void _write_register(uint8_t reg, uint8_t data) const;
