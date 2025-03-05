@@ -12,4 +12,5 @@ void wait_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055) {
     std::cout << "phase to fall!!" << std::endl;
     sleep_ms(5000);
   }
+  sleep_ms(100);
 }

@@ -43,8 +43,8 @@ BMP280::BMP280(Flash &flash, i2c_inst_t *i2c_port, uint8_t i2c_addr)
   // _write_register(0xF4, 0b00101000);  //
   // オーバーサンプリングと電源モードを設定
   // (0x27なら気温と気圧を1回ずつ測定，電源モードはNormal)
-  _write_register(0xF5, 0x20); // 測定間隔とノイズ除去フィルターを設定
-                               // (0x20なら62.5ms間隔で，ノイズ除去なし)
+  _write_register(0xF5, 0b00000000); // 測定間隔とノイズ除去フィルターを設定
+                                     // (0x20なら62.5ms間隔で，ノイズ除去なし)
   // _write_register(0xF5, 0b00100100);  // 測定間隔とノイズ除去フィルターを設定
   // (0x20なら62.5ms間隔で，ノイズ除去なし)
   sleep_ms(100);
@@ -72,24 +72,26 @@ BMP280::Measurement_t BMP280::read() {
   double d_pressure, d_tempearture, d_humidity, d_altitude;
 
   _read_raw(&pressure, &temperature, &humidity);
-  _last_press.push_bask(_compensate_pressure(pressure));
+  _last_press.push_back(_compensate_pressure(pressure));
   _last_temp.push_back(_compensate_temp(temperature));
   _last_hum.push_back(_compensate_humidity(humidity));
 
-  if(_last_press.size()>3){
+  if (_last_press.size() > 3) {
     _last_press.erase(_last_press.begin());
   }
-  if(_last_temp.size()>3){
+  if (_last_temp.size() > 3) {
     _last_temp.erase(_last_temp.begin());
   }
-  if(_last_hum.size()>3){
+  if (_last_hum.size() > 3) {
     _last_hum.erase(_last_hum.begin());
   }
 
-  d_pressure = median(_last_press.at(0),_last_press.at(1),_last_press.at(2)) / 100.0;
-  d_tempearture = median(_last_temp.at(0),_last_temp.at(1),_last_temp.at(2)) / 100.0;
-  d_humidity = median(_last_hum.at(0), _last_hum.at(1), _last_hum.at(2) ) / 1024.0;
-  
+  d_pressure =
+      median(_last_press.at(0), _last_press.at(1), _last_press.at(2)) / 100.0;
+  d_tempearture =
+      median(_last_temp.at(0), _last_temp.at(1), _last_temp.at(2)) / 100.0;
+  d_humidity =
+      median(_last_hum.at(0), _last_hum.at(1), _last_hum.at(2)) / 1024.0;
 
   // bmp.erase(bmp.begin());
   // bmp.erase(bmp.begin());

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <tuple>
+#include <vector>
 
 #include "hardware/i2c.h"
 #include "pico/stdlib.h"
@@ -81,17 +82,17 @@ private:
   int8_t dig_H6;
   int16_t dig_H2, dig_H4, dig_H5;
   // vector
-  std::vector<double> _last_press={0.0,0.0,0.0};
-  std::vector<double> _last_temp={0.0,0.0,0.0};
-  std::vector<double> _last_hum={0.0,0.0,0.0};
+  std::vector<double> _last_press = {0.0, 0.0, 0.0};
+  std::vector<double> _last_temp = {0.0, 0.0, 0.0};
+  std::vector<double> _last_hum = {0.0, 0.0, 0.0};
+
+  //! @brief 中央値を求める
+  template <class T>
+  constexpr inline const T &median(const T &num0, const T &num1,
+                                   const T &num2) {
+    return (num0 < num1 ? (num1 < num2 ? num1 : (num0 < num2 ? num2 : num0))
+                        : (num0 < num2 ? num0 : (num1 < num2 ? num2 : num1)));
+  }
 };
-
-//! @brief 中央値を求める
-template <class T>
-constexpr inline const T &median(const T &num0, const T &num1, const T &num2) {
-  return (num0 < num1 ? (num1 < num2 ? num1 : (num0 < num2 ? num2 : num0))
-                      : (num0 < num2 ? num0 : (num1 < num2 ? num2 : num1)));
-}
-
 
 #endif // SC24_FM_BMP280_HPP_
