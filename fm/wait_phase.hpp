@@ -16,7 +16,6 @@
 #include "sd_card/sd_card.hpp"
 #include "servo/servo.hpp"
 
-void wait_phase(Phase &phase, Flash &flash, BMP280 &bmp280,
-                const BNO055 &bno055);
+void wait_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055);
 
 #endif // SC24_FM_WAIT_PHASE_HPP_

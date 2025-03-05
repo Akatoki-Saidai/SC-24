@@ -116,9 +116,8 @@ Rotation_clockwise_xy(std::pair<double, double> vec_xy, double radian) {
   return {new_vector_x, new_vector_y};
 }
 
-void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280,
-                const BNO055 &bno055, GPS &gps, const Servo &servo_r,
-                const Servo &servo_l) {
+void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
+                GPS &gps, const Servo &servo_r, const Servo &servo_l) {
   //------ちゃんと動くか確認するためのコード-----
   // std::vector<float> mag_vector = {0.0,0.0,0.0};
   // auto gps_data_goal = {0.0,0.0};//{lon,lat}で入っている想定
@@ -129,7 +128,8 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280,
   auto gps_data = gps.read();
   auto bmp_data = bmp280.read();
   std::pair<double, double> gps_data_cansat = {gps_data.lat, gps_data.lon};
-  std::pair<double, double> gps_data_goal = {0.0, 0.0}; // ここは自分で入力
+  std::pair<double, double> gps_data_goal = {30.414138,
+                                             130.904127}; // ここは自分で入力
   //-------------------------------------------
 
   // 処理に使うデータ
@@ -221,9 +221,9 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280,
   if (distance < 10) {
     phase = Phase::Goal;
   }
-    if (g_lat < c_lat) {
-      phase = Phase::Goal;
-    }
+  if (g_lat < c_lat) {
+    phase = Phase::Goal;
+  }
 }
 
 // 加速度(進行方向)考慮ver---------------------------------------------------

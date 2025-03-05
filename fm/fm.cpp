@@ -71,17 +71,17 @@ int main() {
       //   bno055.read();
 
       //   gps.read();
-      servo_l.left_turn();
-      servo_r.left_turn();
+      // servo_l.left_turn();
+      // servo_r.left_turn();
       // gpio_put(9, 1);
-      sleep_ms(2000);
-      servo_l.stop_turn();
-      servo_r.stop_turn();
-      servo_l.right_turn();
-      servo_r.right_turn();
-      sleep_ms(2000);
-      servo_l.stop_turn();
-      servo_r.stop_turn();
+      // sleep_ms(2000);
+      // servo_l.stop_turn();
+      // servo_r.stop_turn();
+      // servo_l.right_turn();
+      // servo_r.right_turn();
+      // sleep_ms(2000);
+      // servo_l.stop_turn();
+      // servo_r.stop_turn();
       // return 0;
       // sd.write("aiueo");
       // gpio_put(9, 0);
@@ -94,7 +94,7 @@ int main() {
         fall_phase(phase, flash, bmp280, bno055, gps, servo_r, servo_l);
         break;
       case Phase::Goal:
-        goal_phase(phase, flash, bmp280, gps, servo_r, servo_l);
+        goal_phase(phase, flash, bmp280, bno055, gps, servo_r, servo_l);
         break;
       }
     } catch (const std::exception &e) {

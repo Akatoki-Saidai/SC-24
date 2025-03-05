@@ -65,7 +65,7 @@ BNO055::BNO055(Flash &flash, i2c_inst_t *i2c_port, uint8_t i2c_addr)
 
 BNO055::~BNO055() {}
 
-BNO055::Measurement_t BNO055::read(void) const {
+BNO055::Measurement_t BNO055::read(void) {
   // read acceleration data
   uint8_t line_accel[6];
   i2c_write_blocking(_i2c_port, _i2c_addr, &LineAccelVal, 1, true);
@@ -124,17 +124,38 @@ BNO055::Measurement_t BNO055::read(void) const {
 
   // std::vector<double> gyro_vector{d_gyroX, d_gyroY, d_gyroZ};
 
-  printf("bno055 accel: %f, %f, %f\n", line_accel_vector[0],
-         line_accel_vector[1], line_accel_vector[2]);
-  _flash.write("bno055 accel: %f, %f, %f\n", line_accel_vector[0],
-               line_accel_vector[1], line_accel_vector[2]);
-  printf("bno055 grv: %f, %f, %f\n", grv_vector[0], grv_vector[1],
-         grv_vector[2]);
-  _flash.write("bno055 grv: %f, %f, %f\n", grv_vector[0], grv_vector[1],
-               grv_vector[2]);
-  printf("bno055 mag: %f, %f, %f\n", mag_vector[0], mag_vector[1],
-         mag_vector[2]);
-  _flash.write("bno055 mag: %f, %f, %f\n", mag_vector[0], mag_vector[1],
-               mag_vector[2]);
-  return {line_accel_vector, grv_vector, mag_vector};
+  _last_line_accel.push_back(line_accel_vector);
+  if (3 < _last_line_accel.size()) {
+    _last_line_accel.erase(_last_line_accel.begin());
+  }
+  std::vector<double> median_line_accel = median(
+      _last_line_accel.at(0), _last_line_accel.at(1), _last_line_accel.at(2));
+
+  _last_mag.push_back(mag_vector);
+  if (3 < _last_mag.size()) {
+    _last_mag.erase(_last_mag.begin());
+  }
+  std::vector<double> median_mag =
+      median(_last_mag.at(0), _last_mag.at(1), _last_mag.at(2));
+
+  _last_grv.push_back(grv_vector);
+  if (3 < _last_grv.size()) {
+    _last_grv.erase(_last_grv.begin());
+  }
+  std::vector<double> median_grv =
+      median(_last_grv.at(0), _last_grv.at(1), _last_grv.at(2));
+
+  printf("bno055 accel: %f, %f, %f\n", median_line_accel[0],
+         median_line_accel[1], median_line_accel[2]);
+  _flash.write("bno055 accel: %f, %f, %f\n", median_line_accel[0],
+               median_line_accel[1], median_line_accel[2]);
+  printf("bno055 mag: %f, %f, %f\n", median_mag[0], median_mag[1],
+         median_mag[2]);
+  _flash.write("bno055 mag: %f, %f, %f\n", median_mag[0], median_mag[1],
+               median_mag[2]);
+  printf("bno055 grv: %f, %f, %f\n", median_grv[0], median_grv[1],
+         median_grv[2]);
+  _flash.write("bno055 grv: %f, %f, %f\n", median_grv[0], median_grv[1],
+               median_grv[2]);
+  return {median_line_accel, median_mag, median_grv};
 }

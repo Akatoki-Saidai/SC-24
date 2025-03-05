@@ -21,7 +21,7 @@ public:
   BNO055(Flash &falsh, i2c_inst_t *i2c_port = i2c0,
          uint8_t i2c_addr = DefaultI2cAddr); // コンストラクタ
   ~BNO055();                                 // デストラクタ
-  Measurement_t read() const;
+  Measurement_t read();
 
 private:
   Flash &_flash; // 出力用のフラッシュメモリ
@@ -35,6 +35,26 @@ private:
   // static constexpr uint8_t GyroVal = 0x14; //GYR_DATA_X_LSB 0x14
   static constexpr uint8_t GrvVal = 0x2E;       // GRV_DATA_X_LSB 0x2E
   static constexpr uint8_t LineAccelVal = 0x28; // LIA_DATA_X_LSB 0x28
+
+  std::vector<std::vector<double>> _last_line_accel = {
+      {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+  std::vector<std::vector<double>> _last_mag = {
+      {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+  std::vector<std::vector<double>> _last_grv = {
+      {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
 };
+
+//! @brief 中央値を求める
+template <class T>
+constexpr inline const T &median(const T &num0, const T &num1, const T &num2) {
+  return (num0 < num1 ? (num1 < num2 ? num1 : (num0 < num2 ? num2 : num0))
+                      : (num0 < num2 ? num0 : (num1 < num2 ? num2 : num1)));
+}
+
+//! @brief 平均値を求める
+template <class T>
+constexpr inline T average(const T &num0, const T &num1, const T &num2) {
+  return T((num0 + num1 + num2) * (1.0 / 3.0));
+}
 
 #endif // SC24_FM_BNO055_HPP_

@@ -16,7 +16,7 @@
 #include "sd_card/sd_card.hpp"
 #include "servo/servo.hpp"
 
-void goal_phase(Phase &phase, Flash &flash, BMP280 &bmp280, GPS &gps,
-                const Servo &servo_r, const Servo &servo_l);
+void goal_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
+                GPS &gps, const Servo &servo_r, const Servo &servo_l);
 
 #endif // SC24_FM_GOAL_PHASE_HPP_
