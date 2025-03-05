@@ -14,8 +14,7 @@ constexpr double radius_e = 6378000; // 地球半径(m)
 double deg_to_rad(const double &num) { return num * M_PI / 180.0; }
 
 // 緯度経度を平面直角座標に変換する(chatGPTくんにやってもらった。自分で書いたのは一番下にある。)
-std::pair<double, double> calc_xy(double phi_deg, double lambda_deg,
-                                  double phi0_deg, double lambda0_deg) {
+std::pair<double, double> calc_xy(double phi_deg, double lambda_deg,double phi0_deg, double lambda0_deg) {
   // 緯度経度・平面直角座標系原点をラジアンに直す
   double phi_rad = phi_deg * M_PI / 180.0;
   double lambda_rad = lambda_deg * M_PI / 180.0;
@@ -106,8 +105,7 @@ std::pair<double, double> calc_xy(double phi_deg, double lambda_deg,
 // }
 
 // 時計回りに回転する関数
-std::pair<double, double>
-Rotation_clockwise_xy(std::pair<double, double> vec_xy, double radian) {
+std::pair<double, double>Rotation_clockwise_xy(std::pair<double, double> vec_xy, double radian) {
   double sin_rad = std::sin(radian);
   double cos_rad = std::cos(radian);
   double new_vector_x = vec_xy.first * cos_rad + vec_xy.second * sin_rad;
@@ -126,6 +124,7 @@ void fall_phase(Phase &phase, BMP280 &bmp280, const BNO055 &bno055, GPS &gps,
   //------本番用のコード------------------------
   auto bno_data = bno055.read(); //{accel,grv,mag}の順番で入っている想定
   auto gps_data = gps.read();
+  auto bmp_data = bmp.read();
   std::pair<double, double> gps_data_cansat = {gps_data.lat, gps_data.lon};
   std::pair<double, double> gps_data_goal = {0.0, 0.0}; // ここは自分で入力
   //-------------------------------------------
@@ -137,16 +136,12 @@ void fall_phase(Phase &phase, BMP280 &bmp280, const BNO055 &bno055, GPS &gps,
   double c_lat = std::get<1>(gps_data_cansat); // 自分の緯度
   std::pair<double, double> North_xy = {
       bno_data.accel[0], bno_data.accel[1]}; // cansatから見た北の方向(xy平面)
-  std::pair<double, double> Cansat_forward_xy = {
-      1.0,
-      0.0}; // 正面をx軸の方としている(これはbnoの向き次第、違ったら適宜変更)
-
+  std::pair<double, double> Cansat_forward_xy = {1.0,0.0}; // 正面をx軸の方としている(これはbnoの向き次第、違ったら適宜変更)
   // cansatを原点とした座標でgoalを表す
   std::pair<double, double> goal_xy = calc_xy(g_lat, g_lon, c_lat, c_lon);
   // 距離を求める
   double distance = std::sqrt((goal_xy.first) * (goal_xy.first) +
                               (goal_xy.second) * (goal_xy.second));
-
   // 方角基底(北がx軸の右手系)からCansat基底(正面がx軸の右手系)にgoal_xyを変換----------------------
   // step1:北がx軸になるように変換(現在は東がx軸なので、基底を90°だけ反時計回りに回転⇔成分を90°だけ時計回りに回転)
   std::pair<double, double> goal_xy_north_basis =
@@ -169,59 +164,51 @@ void fall_phase(Phase &phase, BMP280 &bmp280, const BNO055 &bno055, GPS &gps,
   // 角度から指示を出す。
 
   // 要変更！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
-
   // 遠距離フェーズもどきver---------------------------------------------------
-  if ((3 * M_PI / 4) <= goal_angle_cansat_basis &&
-      goal_angle_cansat_basis < (5 * M_PI / 4)) // 正面にゴールがある時の指示
+  if ((3 * M_PI / 4) <= goal_angle_cansat_basis &&goal_angle_cansat_basis < (5 * M_PI / 4)) // 正面にゴールがある時の指示
   {
-    while (right_count != 0 &&
-           left_count !=
-               0) // もう巻き取っている場合はより戻して左右均等にする。
-    {
-      if (right_count > 0) {
-        servo_l.left_turn();
+    while (right_count != 0 && left_count !=0) // もう巻き取っている場合はより戻して左右均等にする。
+    {if (right_count > 0) {
+        servo_r.left_turn();
         sleep_ms(2000);
         right_count = right_count - 1;
-        servo_l.stop_turn();
-      }
-      if (left_count > 0) {
-        servo_r.right_turn();
-        sleep_ms(2000);
-        left_count = left_count - 1;
         servo_r.stop_turn();
       }
+      if (left_count > 0) {
+        servo_l.right_turn();
+        sleep_ms(2000);
+        left_count = left_count - 1;
+        servo_l.stop_turn();
+      }
     }
-  } else if ((1 * M_PI / 4) <= goal_angle_cansat_basis &&
-             goal_angle_cansat_basis <
-                 (3 * M_PI / 4)) // 右にゴールがあるときの指示
+  } else if ((1 * M_PI / 4) <= goal_angle_cansat_basis && goal_angle_cansat_basis < (3 * M_PI / 4)) // 右にゴールがあるときの指示
   {
-    servo_l.right_turn();
+    servo_r.right_turn();
     sleep_ms(2000);
     right_count = right_count + 1;
-    servo_l.stop_turn();
-
-  } else if ((5 * M_PI / 4) <= goal_angle_cansat_basis &&
-             goal_angle_cansat_basis <
-                 (7 * M_PI / 4)) // 左にゴールがあるときの指示
-  {
-    servo_r.left_turn();
-    sleep_ms(2000);
-    left_count = left_count + 1;
     servo_r.stop_turn();
 
-  } else if (goal_angle_cansat_basis < (1 * M_PI / 4) ||
-             (7 * M_PI / 4) <=
-                 goal_angle_cansat_basis) // 後ろにゴールがあるときの指示
+  } else if ((5 * M_PI / 4) <= goal_angle_cansat_basis && goal_angle_cansat_basis < (7 * M_PI / 4)) // 左にゴールがあるときの指示
   {
-    servo_l.right_turn();
+    servo_l.left_turn();
+    sleep_ms(2000);
+    left_count = left_count + 1;
+    servo_l.stop_turn();
+
+  } else if (goal_angle_cansat_basis < (1 * M_PI / 4) || (7 * M_PI / 4) <= goal_angle_cansat_basis) // 後ろにゴールがあるときの指示
+  {
+    servo_r.right_turn();
     sleep_ms(4000);
     right_count = right_count + 2;
-    servo_l.stop_turn();
+    servo_r.stop_turn();
   }
 
-  if (distance < 15) {
+  if (distance < 10) {
     phase = Phase::Goal;
   }
+//   if () {
+//     phase = Phase::Goal;
+//   }
 }
 
 // 加速度(進行方向)考慮ver---------------------------------------------------
