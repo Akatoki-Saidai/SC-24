@@ -221,9 +221,9 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280,
   if (distance < 10) {
     phase = Phase::Goal;
   }
-  //   if () {
-  //     phase = Phase::Goal;
-  //   }
+    if (g_lat < c_lat) {
+      phase = Phase::Goal;
+    }
 }
 
 // 加速度(進行方向)考慮ver---------------------------------------------------
