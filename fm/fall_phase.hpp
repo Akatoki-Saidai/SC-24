@@ -16,7 +16,8 @@
 #include "sd_card/sd_card.hpp"
 #include "servo/servo.hpp"
 
-void fall_phase(Phase &phase, BMP280 &bmp280, const BNO055 &bno055, GPS &gps,
-                const Servo &servo_r, const Servo &servo_l);
+void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280,
+                const BNO055 &bno055, GPS &gps, const Servo &servo_r,
+                const Servo &servo_l);
 
 #endif // SC24_FM_FALL_PHASE_HPP_

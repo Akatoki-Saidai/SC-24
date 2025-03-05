@@ -22,9 +22,10 @@ int main() {
   // ピンをGNDに手動で繋げている場合
   if (gpio_get(15) == false) {
     flash.print(); // フラッシュメモリに保存されている全データを出力
-    sleep_ms(10 * 1000);
+    return 0;
   }
   flash.clear(); // フラッシュメモリのデータをリセット
+  flash.write("flash init ok\n");
 
   // SDカードのセットアップ
   // SD sd;
@@ -87,17 +88,18 @@ int main() {
 
       switch (phase) {
       case Phase::Wait:
-        wait_phase(phase, bmp280, bno055);
+        wait_phase(phase, flash, bmp280, bno055);
         break;
       case Phase::Fall:
-        fall_phase(phase, bmp280, bno055, gps, servo_r, servo_l);
+        fall_phase(phase, flash, bmp280, bno055, gps, servo_r, servo_l);
         break;
       case Phase::Goal:
-        goal_phase(phase, bmp280, gps, servo_r, servo_l);
+        goal_phase(phase, flash, bmp280, gps, servo_r, servo_l);
         break;
       }
     } catch (const std::exception &e) {
       printf("%s", e.what());
+      flash.write("%s", e.what());
     }
   }
 }
