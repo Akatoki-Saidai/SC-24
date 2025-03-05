@@ -42,19 +42,14 @@ private:
       {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
   std::vector<std::vector<double>> _last_grv = {
       {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+
+  //! @brief 中央値を求める
+  template <class T>
+  constexpr inline const T &median(const T &num0, const T &num1,
+                                   const T &num2) {
+    return (num0 < num1 ? (num1 < num2 ? num1 : (num0 < num2 ? num2 : num0))
+                        : (num0 < num2 ? num0 : (num1 < num2 ? num2 : num1)));
+  }
 };
-
-//! @brief 中央値を求める
-template <class T>
-constexpr inline const T &median(const T &num0, const T &num1, const T &num2) {
-  return (num0 < num1 ? (num1 < num2 ? num1 : (num0 < num2 ? num2 : num0))
-                      : (num0 < num2 ? num0 : (num1 < num2 ? num2 : num1)));
-}
-
-//! @brief 平均値を求める
-template <class T>
-constexpr inline T average(const T &num0, const T &num1, const T &num2) {
-  return T((num0 + num1 + num2) * (1.0 / 3.0));
-}
 
 #endif // SC24_FM_BNO055_HPP_

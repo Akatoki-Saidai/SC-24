@@ -206,9 +206,13 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
 
   if (distance < 10) {
     phase = Phase::Goal;
+    printf("enter goal_phase");
+    sleep_ms(5000);
   }
   if (g_lat < c_lat) {
     phase = Phase::Goal;
+    printf("enter goal_phase");
+    sleep_ms(5000);
   }
 }
 
