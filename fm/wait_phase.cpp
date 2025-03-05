@@ -9,6 +9,7 @@ void wait_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055) {
   printf("accel_abs: %f\n", accel_abs);
   if (accel_abs > 20 /*&& altitude > 30*/) {
     phase = Phase::Fall;
+    gpio_put(13, true);
     std::cout << "phase to fall!!" << std::endl;
     sleep_ms(5000);
   }

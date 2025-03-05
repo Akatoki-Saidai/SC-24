@@ -1,5 +1,6 @@
 #include "fall_phase.hpp"
 #include <cmath>
+#include <cstdlib>
 
 // どれだけ巻いたかを記録するための変数
 int right_count = 0; // 右に曲がった時のカウント
@@ -11,10 +12,13 @@ int basic_left_count = 0;
 constexpr double radius_e = 6378000; // 地球半径(m)
 
 // degreeからradへの変換
-// double deg_to_rad(const double &num) { return num * M_PI / 180.0; }
+double deg_to_rad(const double &num) { return num * M_PI / 180.0; }
+// radからdegreeへの変換
+double rad_to_deg(const double &num) { return num * 180 / M_PI; }
 
 // 緯度経度を平面直角座標に変換する(chatGPTくんにやってもらった。自分で書いたのは一番下にある。)
-// std::pair<double, double> calc_xy(double phi_deg, double lambda_deg, double phi0_deg, double lambda0_deg) {
+// std::pair<double, double> calc_xy(double phi_deg, double lambda_deg, double
+// phi0_deg, double lambda0_deg) {
 //   // 緯度経度・平面直角座標系原点をラジアンに直す
 //   double phi_rad = phi_deg * M_PI / 180.0;
 //   double lambda_rad = lambda_deg * M_PI / 180.0;
@@ -36,7 +40,8 @@ constexpr double radius_e = 6378000; // 地球半径(m)
 //   auto alpha_array = [](double n) {
 //     std::array<double, 6> alpha = {
 //         std::nan(""),
-//         (1. / 2) * n - (2. / 3) * std::pow(n, 2) + (5. / 16) * std::pow(n, 3) +
+//         (1. / 2) * n - (2. / 3) * std::pow(n, 2) + (5. / 16) * std::pow(n, 3)
+//         +
 //             (41. / 180) * std::pow(n, 4) - (127. / 288) * std::pow(n, 5),
 //         (13. / 48) * std::pow(n, 2) - (3. / 5) * std::pow(n, 3) +
 //             (557. / 1440) * std::pow(n, 4) + (281. / 630) * std::pow(n, 5),
@@ -63,7 +68,8 @@ constexpr double radius_e = 6378000; // 地球半径(m)
 //       (m0 * a) / (1. + n) *
 //       (A[0] * phi0_rad + A[1] * std::sin(2 * phi0_rad) +
 //        A[2] * std::sin(4 * phi0_rad) + A[3] * std::sin(6 * phi0_rad) +
-//        A[4] * std::sin(8 * phi0_rad) + A[5] * std::sin(10 * phi0_rad)); // [m]
+//        A[4] * std::sin(8 * phi0_rad) + A[5] * std::sin(10 * phi0_rad)); //
+//        [m]
 
 //   // (3) lambda_c, lambda_sの計算
 //   double lambda_c = std::cos(lambda_rad - lambda0_rad);
@@ -82,30 +88,33 @@ constexpr double radius_e = 6378000; // 地球半径(m)
 
 //   // (6) x, yの計算
 //   double x =
-//       A_ * (xi2 + alpha[1] * std::sin(2 * xi2) + alpha[2] * std::sin(4 * xi2) +
+//       A_ * (xi2 + alpha[1] * std::sin(2 * xi2) + alpha[2] * std::sin(4 * xi2)
+//       +
 //             alpha[3] * std::sin(6 * xi2) + alpha[4] * std::sin(8 * xi2) +
 //             alpha[5] * std::sin(10 * xi2)) -
 //       S_; // [m]
 //   double y =
-//       A_ * (eta2 + alpha[1] * std::cos(2 * xi2) + alpha[2] * std::cos(4 * xi2) +
+//       A_ * (eta2 + alpha[1] * std::cos(2 * xi2) + alpha[2] * std::cos(4 *
+//       xi2) +
 //             alpha[3] * std::cos(6 * xi2) + alpha[4] * std::cos(8 * xi2) +
 //             alpha[5] * std::cos(10 * xi2)); // [m]
 
 //   return {x, y}; // [m]
 // }
 
-//三角関数verのcalc_xy
-std::pair<double,double> calc_xy(double phi_deg, double lambda_deg, double
-phi0_deg, double lambda0_deg){
-    double difference_lon = lambda_deg - lambda0_deg;
-    double difference_lat = phi_deg - phi0_deg;
-    double x = difference_lon*radius_e;
-    double y = difference_lat*radius_e;
-    return{x,y};
+// 三角関数verのcalc_xy
+std::pair<double, double> calc_xy(double phi_deg, double lambda_deg,
+                                  double phi0_deg, double lambda0_deg) {
+  double difference_lon = lambda_deg - lambda0_deg;
+  double difference_lat = phi_deg - phi0_deg;
+  double x = difference_lon * radius_e;
+  double y = difference_lat * radius_e;
+  return {x, y};
 }
 
 // 時計回りに回転する関数
-std::pair<double, double>Rotation_clockwise_xy(std::pair<double, double> vec_xy, double radian) {
+std::pair<double, double>
+Rotation_clockwise_xy(std::pair<double, double> vec_xy, double radian) {
   double sin_rad = std::sin(radian);
   double cos_rad = std::cos(radian);
   double new_vector_x = vec_xy.first * cos_rad + vec_xy.second * sin_rad;
@@ -125,9 +134,10 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
   auto bno_data = bno055.read(); //{accel,grv,mag}の順番で入っている想定
   auto gps_data = gps.read();
   auto bmp_data = bmp280.read();
-  std::pair<double, double> gps_data_cansat = {gps_data.lat, gps_data.lon};
-  std::pair<double, double> gps_data_goal = {30.414138,
-                                             130.904127}; // ここは自分で入力
+  std::pair<double, double> gps_data_cansat = {30.414129, 130.904176};
+  //   std::pair<double, double> gps_data_cansat = {gps_data.lat, gps_data.lon};
+  std::pair<double, double> gps_data_goal = {30.413835,
+                                             130.903371}; // ここは自分で入力
   //-------------------------------------------
 
   // 処理に使うデータ
@@ -135,37 +145,51 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
   double g_lat = std::get<1>(gps_data_goal);   // ゴールの緯度
   double c_lon = std::get<0>(gps_data_cansat); // 自分の経度
   double c_lat = std::get<1>(gps_data_cansat); // 自分の緯度
-  std::pair<double, double> North_xy = {bno_data.accel[0], bno_data.accel[1]}; // cansatから見た北の方向(xy平面)
-  std::pair<double, double> Cansat_forward_xy = {1.0,0.0}; // 正面をx軸の方としている(これはbnoの向き次第、違ったら適宜変更)
+  std::pair<double, double> North_xy = {
+      bno_data.mag[0], bno_data.mag[1]}; // cansatから見た北の方向(xy平面)
+  std::pair<double, double> Cansat_forward_xy = {
+      1.0,
+      0.0}; // 正面をx軸の方としている(これはbnoの向き次第、違ったら適宜変更)
   // cansatを原点とした座標でgoalを表す
   std::pair<double, double> goal_xy = calc_xy(g_lat, g_lon, c_lat, c_lon);
   // 距離を求める
-  double distance = std::sqrt((goal_xy.first) * (goal_xy.first) + (goal_xy.second) * (goal_xy.second));
+  double distance = std::sqrt((goal_xy.first) * (goal_xy.first) +
+                              (goal_xy.second) * (goal_xy.second));
   printf("distance: %f\n", distance);
-  _flash.write("distance: %f\n", distance);
+  flash.write("distance: %f\n", distance);
   // 方角基底(北がx軸の右手系)からCansat基底(正面がx軸の右手系)にgoal_xyを変換----------------------
   // step1:北がx軸になるように変換(現在は東がx軸なので、基底を90°だけ反時計回りに回転⇔成分を90°だけ時計回りに回転)
-  std::pair<double, double> goal_xy_north_basis = Rotation_clockwise_xy(goal_xy, M_PI / 2);
+  std::pair<double, double> goal_xy_north_basis =
+      Rotation_clockwise_xy(goal_xy, M_PI / 2);
   // step2:方角基底からcansat基底に変換
   // step2-1:北が正面から見て何度反時計回りにズレているかを計算
-  double North_angle_cansat_basis = std::atan2(North_xy.second, North_xy.first) - std::atan2(Cansat_forward_xy.second, Cansat_forward_xy.first);
+  double North_angle_cansat_basis =
+      std::atan2(North_xy.second, North_xy.first) -
+      std::atan2(Cansat_forward_xy.second, Cansat_forward_xy.first);
   // step2-2:ズレている分だけ基底を回転させる(成分は反時計回転なので-1をかけてあげる)
-  std::pair<double, double> goal_xy_cansat_basis = Rotation_clockwise_xy(goal_xy_north_basis, -1 * North_angle_cansat_basis);
+  std::pair<double, double> goal_xy_cansat_basis =
+      Rotation_clockwise_xy(goal_xy_north_basis, -1 * North_angle_cansat_basis);
   //------------------------------------------------------------------------------------------
   // ここまでの操作で、Cansat正面をx軸とした基底でgoalの方向を定めることができた。
   // あとは、その角度からどっちに舵を取ればいいかを決めればよい。
   // 角度を求める(0~2PI)
-  double goal_angle_cansat_basis = std::atan2(goal_xy_cansat_basis.second, goal_xy_cansat_basis.first);
-  goal_angle_cansat_basis = goal_angle_cansat_basis + M_PI;
+  double goal_angle_cansat_basis =
+      std::atan2(goal_xy_cansat_basis.second, goal_xy_cansat_basis.first);
+  goal_angle_cansat_basis = std::abs(goal_angle_cansat_basis - M_PI);
   printf("angle: %f\n", goal_angle_cansat_basis);
-  _flash.write("angle: %f\n", goal_angle_cansat_basis);
+  printf("angle_deg: %f\n", rad_to_deg(goal_angle_cansat_basis));
+  flash.write("angle: %f\n", goal_angle_cansat_basis);
+
   // 角度から指示を出す。
   // 要変更！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
   // 遠距離フェーズもどきver---------------------------------------------------
   if ((3 * M_PI / 4) <= goal_angle_cansat_basis &&
       goal_angle_cansat_basis < (5 * M_PI / 4)) // 正面にゴールがある時の指示
   {
-    while (right_count != 0 && left_count != 0) // もう巻き取っている場合はより戻して左右均等にする。
+    printf("front!!");
+    while (right_count != 0 &&
+           left_count !=
+               0) // もう巻き取っている場合はより戻して左右均等にする。
     {
       if (right_count > 0) {
         servo_r.left_turn();
@@ -180,22 +204,29 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
         servo_l.stop_turn();
       }
     }
-  } else if ((1 * M_PI / 4) <= goal_angle_cansat_basis && goal_angle_cansat_basis < (3 * M_PI / 4)) // 右にゴールがあるときの指示
+  } else if ((1 * M_PI / 4) <= goal_angle_cansat_basis &&
+             goal_angle_cansat_basis <
+                 (3 * M_PI / 4)) // 右にゴールがあるときの指示
   {
+    printf("right!!");
     servo_r.right_turn();
     sleep_ms(2000);
     right_count = right_count + 1;
     servo_r.stop_turn();
-
-  } else if ((5 * M_PI / 4) <= goal_angle_cansat_basis && goal_angle_cansat_basis < (7 * M_PI / 4)) // 左にゴールがあるときの指示
+  } else if ((5 * M_PI / 4) <= goal_angle_cansat_basis &&
+             goal_angle_cansat_basis <
+                 (7 * M_PI / 4)) // 左にゴールがあるときの指示
   {
+    printf("left!!");
     servo_l.left_turn();
     sleep_ms(2000);
     left_count = left_count + 1;
     servo_l.stop_turn();
-
-  } else if (goal_angle_cansat_basis < (1 * M_PI / 4) || (7 * M_PI / 4) <= goal_angle_cansat_basis) // 後ろにゴールがあるときの指示
+  } else if (goal_angle_cansat_basis < (1 * M_PI / 4) ||
+             (7 * M_PI / 4) <=
+                 goal_angle_cansat_basis) // 後ろにゴールがあるときの指示
   {
+    printf("sharp right!!");
     servo_r.right_turn();
     sleep_ms(4000);
     right_count = right_count + 2;
@@ -207,11 +238,11 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
     printf("enter goal_phase");
     sleep_ms(5000);
   }
-  if (g_lat < c_lat) {
-    phase = Phase::Goal;
-    printf("enter goal_phase");
-    sleep_ms(5000);
-  }
+  //   if (g_lat < c_lat) {
+  //     phase = Phase::Goal;
+  //     printf("enter goal_phase");
+  //     sleep_ms(5000);
+  //   }
 }
 
 // 加速度(進行方向)考慮ver---------------------------------------------------

@@ -5,6 +5,7 @@
 #include <cmath>
 #include <iostream>
 #include <math.h>
+#include <numeric>
 #include <vector>
 
 #include "pico/stdlib.h"

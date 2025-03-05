@@ -13,6 +13,12 @@ int main() {
   sleep_ms(2000);
   printf("stdio_init\n");
 
+  // ジャイロ効果による安定化のためのモーターをセットアップ
+  gpio_init(13);
+  gpio_set_dir(13, GPIO_OUT);
+  gpio_pull_down(13);
+  gpio_put(13, false);
+
   // フラッシュメモリのセットアップ
   gpio_init(15);
   gpio_set_dir(15, GPIO_IN);
@@ -59,7 +65,7 @@ int main() {
   // GPSのセットアップ
   GPS gps(flash, uart0);
 
-  Phase phase = Phase::Wait;
+  Phase phase = Phase::Fall;
 
   // ************************************************** //
   //                        loop                        //
