@@ -69,12 +69,32 @@ BMP280::BMP280(Flash &flash, i2c_inst_t *i2c_port, uint8_t i2c_addr)
 // 気温と気圧を受信
 BMP280::Measurement_t BMP280::read() {
   int32_t pressure, temperature, humidity;
-  _read_raw(&pressure, &temperature, &humidity);
   double d_pressure, d_tempearture, d_humidity, d_altitude;
-  d_pressure = _compensate_pressure(pressure) / 100.0;
-  d_tempearture = _compensate_temp(temperature) / 100.0;
-  d_humidity = _compensate_humidity(humidity) / 1024.0;
-  d_altitude = _get_altitude(pressure / 100.0);
+
+  _read_raw(&pressure, &temperature, &humidity);
+  _last_press.push_bask(_compensate_pressure(pressure));
+  _last_temp.push_back(_compensate_temp(temperature));
+  _last_hum.push_back(_compensate_humidity(humidity));
+
+  if(_last_press.size()>3){
+    _last_press.erase(_last_press.begin());
+  }
+  if(_last_temp.size()>3){
+    _last_temp.erase(_last_temp.begin());
+  }
+  if(_last_hum.size()>3){
+    _last_hum.erase(_last_hum.begin());
+  }
+
+  d_pressure = median(_last_press.at(0),_last_press.at(1),_last_press.at(2)) / 100.0;
+  d_tempearture = median(_last_temp.at(0),_last_temp.at(1),_last_temp.at(2)) / 100.0;
+  d_humidity = median(_last_hum.at(0), _last_hum.at(1), _last_hum.at(2) ) / 1024.0;
+  
+
+  // bmp.erase(bmp.begin());
+  // bmp.erase(bmp.begin());
+
+  d_altitude = _get_altitude(d_pressure);
 
   printf("bmp280 press: %f, temp: %f, hum: %f, alt: %f\n", d_pressure,
          d_tempearture, d_humidity, d_altitude);
