@@ -130,6 +130,8 @@ BNO055::Measurement_t BNO055::read(void) {
   }
   std::vector<double> median_line_accel = median(
       _last_line_accel.at(0), _last_line_accel.at(1), _last_line_accel.at(2));
+  printf("accel_raw %f, %f, %f\n", median_line_accel[0], median_line_accel[1],
+         median_line_accel[2]);
 
   _last_mag.push_back(mag_vector);
   if (3 < _last_mag.size()) {
