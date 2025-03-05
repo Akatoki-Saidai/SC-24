@@ -11,103 +11,101 @@ int basic_left_count = 0;
 constexpr double radius_e = 6378000; // 地球半径(m)
 
 // degreeからradへの変換
-double deg_to_rad(const double &num) { return num * M_PI / 180.0; }
+// double deg_to_rad(const double &num) { return num * M_PI / 180.0; }
 
 // 緯度経度を平面直角座標に変換する(chatGPTくんにやってもらった。自分で書いたのは一番下にある。)
-std::pair<double, double> calc_xy(double phi_deg, double lambda_deg,
-                                  double phi0_deg, double lambda0_deg) {
-  // 緯度経度・平面直角座標系原点をラジアンに直す
-  double phi_rad = phi_deg * M_PI / 180.0;
-  double lambda_rad = lambda_deg * M_PI / 180.0;
-  double phi0_rad = phi0_deg * M_PI / 180.0;
-  double lambda0_rad = lambda0_deg * M_PI / 180.0;
+// std::pair<double, double> calc_xy(double phi_deg, double lambda_deg, double phi0_deg, double lambda0_deg) {
+//   // 緯度経度・平面直角座標系原点をラジアンに直す
+//   double phi_rad = phi_deg * M_PI / 180.0;
+//   double lambda_rad = lambda_deg * M_PI / 180.0;
+//   double phi0_rad = phi0_deg * M_PI / 180.0;
+//   double lambda0_rad = lambda0_deg * M_PI / 180.0;
 
-  // 補助関数
-  auto A_array = [](double n) {
-    std::array<double, 6> A = {
-        1 + std::pow(n, 2) / 4. + std::pow(n, 4) / 64.,
-        -(3. / 2) * (n - std::pow(n, 3) / 8. - std::pow(n, 5) / 64.),
-        (15. / 16) * (std::pow(n, 2) - std::pow(n, 4) / 4.),
-        -(35. / 48) * (std::pow(n, 3) - (5. / 16) * std::pow(n, 5)),
-        (315. / 512) * std::pow(n, 4),
-        -(693. / 1280) * std::pow(n, 5)};
-    return A;
-  };
+//   // 補助関数
+//   auto A_array = [](double n) {
+//     std::array<double, 6> A = {
+//         1 + std::pow(n, 2) / 4. + std::pow(n, 4) / 64.,
+//         -(3. / 2) * (n - std::pow(n, 3) / 8. - std::pow(n, 5) / 64.),
+//         (15. / 16) * (std::pow(n, 2) - std::pow(n, 4) / 4.),
+//         -(35. / 48) * (std::pow(n, 3) - (5. / 16) * std::pow(n, 5)),
+//         (315. / 512) * std::pow(n, 4),
+//         -(693. / 1280) * std::pow(n, 5)};
+//     return A;
+//   };
 
-  auto alpha_array = [](double n) {
-    std::array<double, 6> alpha = {
-        std::nan(""),
-        (1. / 2) * n - (2. / 3) * std::pow(n, 2) + (5. / 16) * std::pow(n, 3) +
-            (41. / 180) * std::pow(n, 4) - (127. / 288) * std::pow(n, 5),
-        (13. / 48) * std::pow(n, 2) - (3. / 5) * std::pow(n, 3) +
-            (557. / 1440) * std::pow(n, 4) + (281. / 630) * std::pow(n, 5),
-        (61. / 240) * std::pow(n, 3) - (103. / 140) * std::pow(n, 4) +
-            (15061. / 26880) * std::pow(n, 5),
-        (49561. / 161280) * std::pow(n, 4) - (179. / 168) * std::pow(n, 5),
-        (34729. / 80640) * std::pow(n, 5)};
-    return alpha;
-  };
+//   auto alpha_array = [](double n) {
+//     std::array<double, 6> alpha = {
+//         std::nan(""),
+//         (1. / 2) * n - (2. / 3) * std::pow(n, 2) + (5. / 16) * std::pow(n, 3) +
+//             (41. / 180) * std::pow(n, 4) - (127. / 288) * std::pow(n, 5),
+//         (13. / 48) * std::pow(n, 2) - (3. / 5) * std::pow(n, 3) +
+//             (557. / 1440) * std::pow(n, 4) + (281. / 630) * std::pow(n, 5),
+//         (61. / 240) * std::pow(n, 3) - (103. / 140) * std::pow(n, 4) +
+//             (15061. / 26880) * std::pow(n, 5),
+//         (49561. / 161280) * std::pow(n, 4) - (179. / 168) * std::pow(n, 5),
+//         (34729. / 80640) * std::pow(n, 5)};
+//     return alpha;
+//   };
 
-  // 定数 (a, F: 世界測地系-測地基準系1980（GRS80）楕円体)
-  double m0 = 0.9999;
-  double a = 6378137.;
-  double F = 298.257222101;
+//   // 定数 (a, F: 世界測地系-測地基準系1980（GRS80）楕円体)
+//   double m0 = 0.9999;
+//   double a = 6378137.;
+//   double F = 298.257222101;
 
-  // (1) n, A_i, alpha_iの計算
-  double n = 1. / (2 * F - 1);
-  auto A = A_array(n);
-  auto alpha = alpha_array(n);
+//   // (1) n, A_i, alpha_iの計算
+//   double n = 1. / (2 * F - 1);
+//   auto A = A_array(n);
+//   auto alpha = alpha_array(n);
 
-  // (2), S, Aの計算
-  double A_ = (m0 * a) / (1. + n) * A[0]; // [m]
-  double S_ =
-      (m0 * a) / (1. + n) *
-      (A[0] * phi0_rad + A[1] * std::sin(2 * phi0_rad) +
-       A[2] * std::sin(4 * phi0_rad) + A[3] * std::sin(6 * phi0_rad) +
-       A[4] * std::sin(8 * phi0_rad) + A[5] * std::sin(10 * phi0_rad)); // [m]
+//   // (2), S, Aの計算
+//   double A_ = (m0 * a) / (1. + n) * A[0]; // [m]
+//   double S_ =
+//       (m0 * a) / (1. + n) *
+//       (A[0] * phi0_rad + A[1] * std::sin(2 * phi0_rad) +
+//        A[2] * std::sin(4 * phi0_rad) + A[3] * std::sin(6 * phi0_rad) +
+//        A[4] * std::sin(8 * phi0_rad) + A[5] * std::sin(10 * phi0_rad)); // [m]
 
-  // (3) lambda_c, lambda_sの計算
-  double lambda_c = std::cos(lambda_rad - lambda0_rad);
-  double lambda_s = std::sin(lambda_rad - lambda0_rad);
+//   // (3) lambda_c, lambda_sの計算
+//   double lambda_c = std::cos(lambda_rad - lambda0_rad);
+//   double lambda_s = std::sin(lambda_rad - lambda0_rad);
 
-  // (4) t, t_の計算
-  double t = std::sinh(
-      std::atanh(std::sin(phi_rad)) -
-      ((2 * std::sqrt(n)) / (1 + n)) *
-          std::atanh(((2 * std::sqrt(n)) / (1 + n)) * std::sin(phi_rad)));
-  double t_ = std::sqrt(1 + t * t);
+//   // (4) t, t_の計算
+//   double t = std::sinh(
+//       std::atanh(std::sin(phi_rad)) -
+//       ((2 * std::sqrt(n)) / (1 + n)) *
+//           std::atanh(((2 * std::sqrt(n)) / (1 + n)) * std::sin(phi_rad)));
+//   double t_ = std::sqrt(1 + t * t);
 
-  // (5) xi', eta'の計算
-  double xi2 = std::atanh(t / lambda_c); // [rad]
-  double eta2 = std::atanh(lambda_s / t_);
+//   // (5) xi', eta'の計算
+//   double xi2 = std::atanh(t / lambda_c); // [rad]
+//   double eta2 = std::atanh(lambda_s / t_);
 
-  // (6) x, yの計算
-  double x =
-      A_ * (xi2 + alpha[1] * std::sin(2 * xi2) + alpha[2] * std::sin(4 * xi2) +
-            alpha[3] * std::sin(6 * xi2) + alpha[4] * std::sin(8 * xi2) +
-            alpha[5] * std::sin(10 * xi2)) -
-      S_; // [m]
-  double y =
-      A_ * (eta2 + alpha[1] * std::cos(2 * xi2) + alpha[2] * std::cos(4 * xi2) +
-            alpha[3] * std::cos(6 * xi2) + alpha[4] * std::cos(8 * xi2) +
-            alpha[5] * std::cos(10 * xi2)); // [m]
+//   // (6) x, yの計算
+//   double x =
+//       A_ * (xi2 + alpha[1] * std::sin(2 * xi2) + alpha[2] * std::sin(4 * xi2) +
+//             alpha[3] * std::sin(6 * xi2) + alpha[4] * std::sin(8 * xi2) +
+//             alpha[5] * std::sin(10 * xi2)) -
+//       S_; // [m]
+//   double y =
+//       A_ * (eta2 + alpha[1] * std::cos(2 * xi2) + alpha[2] * std::cos(4 * xi2) +
+//             alpha[3] * std::cos(6 * xi2) + alpha[4] * std::cos(8 * xi2) +
+//             alpha[5] * std::cos(10 * xi2)); // [m]
 
-  return {x, y}; // [m]
-}
-
-// //三角関数verのcalc_xy
-// std::pair<double,double> calc_xy(double phi_deg, double lambda_deg, double
-// phi0_deg, double lambda0_deg){
-//     double difference_lon = lambda_deg - lambda0_deg;
-//     double difference_lat = phi_deg - phi0_deg;
-//     double x = difference_lon*radius_e;
-//     double y = difference_lat*radius_e;
-//     return{x,y};
+//   return {x, y}; // [m]
 // }
 
+//三角関数verのcalc_xy
+std::pair<double,double> calc_xy(double phi_deg, double lambda_deg, double
+phi0_deg, double lambda0_deg){
+    double difference_lon = lambda_deg - lambda0_deg;
+    double difference_lat = phi_deg - phi0_deg;
+    double x = difference_lon*radius_e;
+    double y = difference_lat*radius_e;
+    return{x,y};
+}
+
 // 時計回りに回転する関数
-std::pair<double, double>
-Rotation_clockwise_xy(std::pair<double, double> vec_xy, double radian) {
+std::pair<double, double>Rotation_clockwise_xy(std::pair<double, double> vec_xy, double radian) {
   double sin_rad = std::sin(radian);
   double cos_rad = std::cos(radian);
   double new_vector_x = vec_xy.first * cos_rad + vec_xy.second * sin_rad;
