@@ -18,12 +18,14 @@ class BNO055 {
   };
 
 public:
-  BNO055(i2c_inst_t *i2c_port = i2c0, uint8_t i2c_addr = DefaultI2cAddr,
-         Flash flash = Flash(nullptr)); // コンストラクタ
-  ~BNO055();                            // デストラクタ
+  BNO055(Flash &falsh, i2c_inst_t *i2c_port = i2c0,
+         uint8_t i2c_addr = DefaultI2cAddr); // コンストラクタ
+  ~BNO055();                                 // デストラクタ
   Measurement_t read() const;
 
 private:
+  Flash &_flash; // 出力用のフラッシュメモリ
+
   static constexpr uint8_t DefaultI2cAddr = 0x28;
   i2c_inst_t *const _i2c_port; // I2Cポート i2c0かi2c1
   const uint8_t _i2c_addr;     // I2Cアドレス

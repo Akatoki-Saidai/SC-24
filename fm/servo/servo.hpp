@@ -12,9 +12,8 @@
 
 class Servo {
 public:
-  Servo(int pin = 18, int freq = 50,
-        Flash flash = Flash(nullptr)); // コンストラクタ
-  ~Servo();                            // デストラクタ
+  Servo(Flash &flash, int pin = 18, int freq = 50); // コンストラクタ
+  ~Servo();                                         // デストラクタ
 
   void start() const;
   void stop() const;
@@ -23,6 +22,8 @@ public:
   void stop_turn() const;
 
 private:
+  Flash &_flash; // 出力用のフラッシュメモリ
+
   int pin;
   int freq;
   Flash f;

@@ -22,7 +22,8 @@ std::deque<char> recv1;
 void read_raw1();
 } // namespace gps
 
-GPS::GPS(uart_inst_t *uart_hw, Flash flash) : _uart_hw(uart_hw) {
+GPS::GPS(Flash &flash, uart_inst_t *uart_hw)
+    : _flash(flash), _uart_hw(uart_hw) {
   // uart_init(_uart_hw, baud_rate);
 
   // gpio_set_function(tx_pin, GPIO_FUNC_UART);
@@ -123,6 +124,7 @@ GPS::Measurement_t GPS::read() {
     if (check_sum_str.size() == 0 ||
         check_sum != std::stoi(check_sum_str, nullptr, 16)) {
       printf("\nfaild check_sum\n");
+      _flash.write("\nfaild check_sum\n");
       continue;
     }
 
@@ -183,6 +185,8 @@ inline void GPS::output_time(std::string &value_str) {
          '0'); // 小数形式で与えられるが，.00しか出力されないようなので小数部分は無視する
     printf("gps_time: %02d:%02d:%02d\n", _measurement.hour, _measurement.minute,
            _measurement.second);
+    _flash.write("gps_time: %02d:%02d:%02d\n", _measurement.hour,
+                 _measurement.minute, _measurement.second);
   }
 }
 
@@ -198,6 +202,7 @@ inline void GPS::output_lat(std::string &value1_str, std::string &value2_str) {
              60.0) *
         ((value2_str == "N") ? 1 : -1);
     printf("gps_lat: %f\n", _measurement.lat);
+    _flash.write("gps_lat: %f\n", _measurement.lat);
   }
 }
 
@@ -214,6 +219,7 @@ inline void GPS::output_lon(std::string &value1_str, std::string &value2_str) {
              60.0) *
         ((value2_str == "E") ? 1 : -1);
     printf("gps_lon: %f\n", _measurement.lon);
+    _flash.write("gps_lon: %f\n", _measurement.lon);
   }
 }
 
@@ -222,6 +228,7 @@ inline void GPS::output_altitude(std::string &value_str) {
   if (value_str != "") {
     _measurement.altitude = std::stof(value_str);
     printf("gps_alt: %f\n", _measurement.altitude);
+    _flash.write("gps_alt: %f\n", _measurement.altitude);
   }
 }
 
@@ -230,6 +237,7 @@ inline void GPS::output_HDOP(std::string &value_str) {
   if (value_str != "") {
     _measurement.HDOP = std::stof(value_str);
     printf("gps_HDOP: %f\n", _measurement.HDOP);
+    _flash.write("gps_HDOP: %f\n", _measurement.HDOP);
   }
 }
 
@@ -238,6 +246,7 @@ inline void GPS::output_geoid_separation(std::string &value_str) {
   if (value_str != "") {
     _measurement.geoid_separation = std::stof(value_str);
     printf("gps_geoid: %f\n", _measurement.geoid_separation);
+    _flash.write("gps_geoid: %f\n", _measurement.geoid_separation);
   }
 }
 
@@ -246,6 +255,7 @@ inline void GPS::output_velocity(std::string &value_str) {
   if (value_str != "") {
     _measurement.velocity = std::stof(value_str) * 1852.0F / 3600.0F;
     printf("gps_velocity: %f\n", _measurement.velocity);
+    _flash.write("gps_velocity: %f\n", _measurement.velocity);
   }
 }
 
@@ -258,6 +268,8 @@ inline void GPS::output_date(std::string &value_str) {
         2000 + (value_str.at(4) - '0') * 10 + (value_str.at(5) - '0');
     printf("gps_date: %02d-%02d-%02d\n", _measurement.day, _measurement.month,
            _measurement.year);
+    _flash.write("gps_date: %02d-%02d-%02d\n", _measurement.day,
+                 _measurement.month, _measurement.year);
   }
 }
 

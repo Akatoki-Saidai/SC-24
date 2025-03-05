@@ -29,9 +29,9 @@ int main() {
   // SDカードのセットアップ
   // SD sd;
 
-  Servo servo_l(26, 50); // 左のサーボ
+  Servo servo_l(flash, 26, 50); // 左のサーボ
   servo_l.start();
-  Servo servo_r(27, 50); // 右のサーボ
+  Servo servo_r(flash, 27, 50); // 右のサーボ
   servo_r.start();
 
   // I2Cのセットアップ
@@ -45,10 +45,10 @@ int main() {
   gpio_pull_up(scl_pin);
 
   // BMP280のセットアップ
-  BMP280 bmp280(i2c1);
+  BMP280 bmp280(flash, i2c1);
 
   // BNO055のセットアップ
-  BNO055 bno055(i2c1);
+  BNO055 bno055(flash, i2c1);
 
   // UARTのセットアップ
   uart_init(uart0, 38400);
@@ -56,7 +56,7 @@ int main() {
   gpio_set_function(1, GPIO_FUNC_UART);
 
   // GPSのセットアップ
-  GPS gps(uart0);
+  GPS gps(flash, uart0);
 
   Phase phase = Phase::Wait;
 
@@ -85,17 +85,17 @@ int main() {
       // sd.write("aiueo");
       // gpio_put(9, 0);
 
-      //   switch (phase) {
-      //   case Phase::Wait:
-      //     wait_phase(phase, bmp280, bno055);
-      //     break;
-      //   case Phase::Fall:
-      //     fall_phase(phase, bmp280, bno055, gps, servo_r, servo_l);
-      //     break;
-      //   case Phase::Goal:
-      //     goal_phase(phase, bmp280, gps, servo_r, servo_l);
-      //     break;
-      //   }
+      switch (phase) {
+      case Phase::Wait:
+        wait_phase(phase, bmp280, bno055);
+        break;
+      case Phase::Fall:
+        fall_phase(phase, bmp280, bno055, gps, servo_r, servo_l);
+        break;
+      case Phase::Goal:
+        goal_phase(phase, bmp280, gps, servo_r, servo_l);
+        break;
+      }
     } catch (const std::exception &e) {
       printf("%s", e.what());
     }

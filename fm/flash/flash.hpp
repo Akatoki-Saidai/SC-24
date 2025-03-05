@@ -10,6 +10,35 @@
 #include "hardware/sync.h"
 #include "pico/stdlib.h"
 
+//! @brief printfの形式で文字列をフォーマット
+//! @param format フォーマット文字列
+//! @param args フォーマット文字列に埋め込む値
+template <typename... Args>
+std::string format_str(const std::string &format, Args... args) noexcept {
+  try {
+    const std::size_t formatted_chars_num = std::snprintf(
+        nullptr, 0, format.c_str(), args...); // フォーマット後の文字数を計算
+    char formatted_chars
+        [formatted_chars_num +
+         1]; // フォーマット済みの文字列を保存するための配列を作成
+    std::snprintf(&formatted_chars[0], formatted_chars_num + 1, format.c_str(),
+                  args...);              // フォーマットを実行
+    return std::string(formatted_chars); // フォーマット済み文字列を出力
+  } catch (const std::exception &e) {
+    std::cout << "           From  FILE : " << __FILE__
+              << "  LINE : " << __LINE__
+              << "\n                 MESSAGE : Failed to format string\n"
+              << e.what() << std::flush;
+  } // ログの保存に失敗しました
+  catch (...) {
+    std::cout << "<<ERROR>>  FILE : " << __FILE__ << "  LINE : " << __LINE__
+              << "\n           MESSAGE : Failed to format string" << std::endl;
+  } // ログの保存に失敗しました
+  return "format error";
+}
+// この関数は以下の資料を参考にて作成しました
+// https://pyopyopyo.hatenablog.com/entry/2019/02/08/102456
+
 class Flash {
   static constexpr uint32_t _target_begin =
       0x1F0000; // W25Q16JVの最終ブロック(Block31)のセクタ0の先頭アドレス
@@ -30,7 +59,13 @@ public:
   Flash(std::nullptr_t null) : _enable(false) {};
 
   //! @brief フラッシュメモリに書き込み
-  void write(std::string write_mesage);
+  void write(const std::string &write_mesage) noexcept;
+
+  //! @brief フラッシュメモリにフォーマット済みのデータを書き込み
+  template <typename... Args>
+  void write(const std::string &format, Args... args) noexcept {
+    write(format_str(format, args...));
+  }
 
   //! @brief フラッシュメモリのデータを出力
   void print();

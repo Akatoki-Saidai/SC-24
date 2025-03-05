@@ -1,6 +1,7 @@
 #include "servo.hpp"
 
-Servo::Servo(int pin, int freq, Flash flash) : pin(pin), freq(freq) {}
+Servo::Servo(Flash &flash, int pin, int freq)
+    : _flash(flash), pin(pin), freq(freq) {}
 
 Servo::~Servo() { stop(); }
 
@@ -34,6 +35,7 @@ void Servo::stop() const {
 
 void Servo::left_turn() const {
   printf("servo left_turn\n");
+  _flash.write("servo left_turn\n");
   // パルス幅を設定(1000[us]~2000[us]で動作するらしい)
   double pulse_width = 2000; //[us]
 
@@ -50,6 +52,7 @@ void Servo::left_turn() const {
 
 void Servo::right_turn() const {
   printf("servo right_turn\n");
+  _flash.write("servo right_turn\n");
 
   // パルス幅を設定(1000[us]~2000[us]で動作するらしい)
   double pulse_width = 1000; //[us]

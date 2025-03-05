@@ -14,8 +14,8 @@
 class BMP280 {
 public:
   // 既にI2Cのセットアップが済んでいることを前提として，BMP280をセットアップ
-  BMP280(i2c_inst_t *i2c_port = i2c0, uint8_t i2c_addr = DefaultI2cAddr,
-         Flash flash = Flash(nullptr));
+  BMP280(Flash &flash, i2c_inst_t *i2c_port = i2c0,
+         uint8_t i2c_addr = DefaultI2cAddr);
 
   struct Measurement_t {
     double pressure;
@@ -28,6 +28,8 @@ public:
   Measurement_t read();
 
 private:
+  Flash &_flash; // 出力用のフラッシュメモリ
+
   i2c_inst_t *const _i2c_port; // I2Cポート  i2c0かi2c1か
   const uint8_t _i2c_addr;     // I2Cアドレス
                            // (センサの電話番号みたいなもの．通信が誰宛かを示す)
@@ -35,8 +37,6 @@ private:
   static constexpr uint8_t ChipIdRegister = 0xd0;
   // static constexpr uint8_t ReadBit = 0x80;  //
   // これはSPI通信で使用します．I2C通信では使用しません
-
-  // Flash &_flash; // 出力用のフラッシュメモリ
 
   // I2CでBMP280にデータを書き込み
   void _write_register(uint8_t reg, uint8_t data) const;

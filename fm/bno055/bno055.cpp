@@ -1,8 +1,8 @@
 #include "bno055.hpp"
 
 // Initialise Accelerometer Function
-BNO055::BNO055(i2c_inst_t *i2c_port, uint8_t i2c_addr, Flash flash)
-    : _i2c_port(i2c_port), _i2c_addr(i2c_addr) {
+BNO055::BNO055(Flash &flash, i2c_inst_t *i2c_port, uint8_t i2c_addr)
+    : _flash(flash), _i2c_port(i2c_port), _i2c_addr(i2c_addr) {
   // 接続が正常か確かめる
   const uint8_t reg = 0x00;
   uint8_t chipID[1];
@@ -10,6 +10,7 @@ BNO055::BNO055(i2c_inst_t *i2c_port, uint8_t i2c_addr, Flash flash)
   i2c_read_blocking(_i2c_port, _i2c_addr, chipID, 1, false);
 
   printf("bno055 chip id: 0x%X (0xAD is correct)\n", chipID[0]);
+  _flash.write("bno055 chip id: 0x%X (0xAD is correct)\n", chipID[0]);
 
   // Use internal oscillator
   uint8_t data[2];
@@ -125,9 +126,15 @@ BNO055::Measurement_t BNO055::read(void) const {
 
   printf("bno055 accel: %f, %f, %f\n", line_accel_vector[0],
          line_accel_vector[1], line_accel_vector[2]);
+  _flash.write("bno055 accel: %f, %f, %f\n", line_accel_vector[0],
+               line_accel_vector[1], line_accel_vector[2]);
   printf("bno055 grv: %f, %f, %f\n", grv_vector[0], grv_vector[1],
          grv_vector[2]);
+  _flash.write("bno055 grv: %f, %f, %f\n", grv_vector[0], grv_vector[1],
+               grv_vector[2]);
   printf("bno055 mag: %f, %f, %f\n", mag_vector[0], mag_vector[1],
          mag_vector[2]);
+  _flash.write("bno055 mag: %f, %f, %f\n", mag_vector[0], mag_vector[1],
+               mag_vector[2]);
   return {line_accel_vector, grv_vector, mag_vector};
 }

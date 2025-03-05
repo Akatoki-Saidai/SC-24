@@ -19,9 +19,10 @@
 */
 
 // 既にI2Cのセットアップが済んでいることを前提として，BMP280をセットアップ
-BMP280::BMP280(i2c_inst_t *i2c_port, uint8_t i2c_addr, Flash flash)
-    : _i2c_port(i2c_port), _i2c_addr(i2c_addr) {
+BMP280::BMP280(Flash &flash, i2c_inst_t *i2c_port, uint8_t i2c_addr)
+    : _flash(flash), _i2c_port(i2c_port), _i2c_addr(i2c_addr) {
   printf("bmp280 start init\n");
+  _flash.write("bmp280 start init\n");
   // stdio_init_all();
   // i2c_init(_i2c_port, 100 * 1000);
   // gpio_set_function(8, GPIO_FUNC_I2C);  // SDAのピン番号を設定
@@ -34,6 +35,7 @@ BMP280::BMP280(i2c_inst_t *i2c_port, uint8_t i2c_addr, Flash flash)
   uint8_t id;
   _read_registers(ChipIdRegister, &id, 1); // チップIDを読み取り
   printf("bmp280 chip id: 0x%X (0x58 is correct)\n", id);
+  _flash.write("bmp280 chip id: 0x%X (0x58 is correct)\n", id);
 
   _write_register(
       0xF4, 0x27); // オーバーサンプリングと電源モードを設定
@@ -50,15 +52,18 @@ BMP280::BMP280(i2c_inst_t *i2c_port, uint8_t i2c_addr, Flash flash)
 
   // 何回か空測定
   printf("bmp280 start initial measurement\n");
+  _flash.write("bmp280 start initial measurement\n");
   for (int i = 0; i < 20; ++i) {
     read();
     sleep_ms(100);
   }
   printf("bmp280 finish initial measurement\n");
+  _flash.write("bmp280 finish initial measurement\n");
   // 高度0[m]の気圧を保存
   _set_qnh();
 
   printf("bmp280 finish init\n");
+  _flash.write("bmp280 finish init\n");
 }
 
 // 気温と気圧を受信
@@ -73,6 +78,8 @@ BMP280::Measurement_t BMP280::read() {
 
   printf("bmp280 press: %f, temp: %f, hum: %f, alt: %f\n", d_pressure,
          d_tempearture, d_humidity, d_altitude);
+  _flash.write("bmp280 press: %f, temp: %f, hum: %f, alt: %f\n", d_pressure,
+               d_tempearture, d_humidity, d_altitude);
   return {d_pressure, d_tempearture, d_humidity, d_altitude};
 }
 
@@ -129,6 +136,8 @@ void BMP280::_read_raw(int32_t *pressure, int32_t *temperature,
 
   printf("bmp280 raw: %d, %d, %d, %d, %d, %d\n", buffer[0], buffer[1],
          buffer[2], buffer[3], buffer[4], buffer[5]);
+  _flash.write("bmp280 raw: %d, %d, %d, %d, %d, %d\n", buffer[0], buffer[1],
+               buffer[2], buffer[3], buffer[4], buffer[5]);
 
   // 生データを引数の指すポインタに保存
   *pressure = ((uint32_t)buffer[0] << 12) | ((uint32_t)buffer[1] << 4) |
@@ -230,8 +239,12 @@ void BMP280::_read_compensation_parameters() {
   _dig_P9 = buffer[22] | (buffer[23] << 8);
 
   printf("bmp280 params %d %d %d\n", _dig_T1, _dig_T2, _dig_T3);
+  _flash.write("bmp280 params %d %d %d\n", _dig_T1, _dig_T2, _dig_T3);
   printf("bmp280 params %d, %d, %d, %d, %d, %d, %d, %d, %d\n", _dig_P1, _dig_P2,
          _dig_P3, _dig_P4, _dig_P5, _dig_P6, _dig_P7, _dig_P8, _dig_P9);
+  _flash.write("bmp280 params %d, %d, %d, %d, %d, %d, %d, %d, %d\n", _dig_P1,
+               _dig_P2, _dig_P3, _dig_P4, _dig_P5, _dig_P6, _dig_P7, _dig_P8,
+               _dig_P9);
 
   dig_H1 = buffer[25];
 

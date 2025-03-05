@@ -14,6 +14,8 @@
 
 class GPS {
 private:
+  Flash &_flash; // 出力用のフラッシュメモリ
+
   uart_inst_t *_uart_hw;
 
   static constexpr uint DataBits = 8;
@@ -24,7 +26,7 @@ private:
   const uint _read_len = 800;
 
 public:
-  GPS(uart_inst_t *uart_hw, Flash flash = Flash(nullptr));
+  GPS(Flash &flash, uart_inst_t *uart_hw);
 
   struct Measurement_t {
     double lat = -1024.0;
