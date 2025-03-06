@@ -16,122 +16,37 @@ double deg_to_rad(const double &num) { return num * M_PI / 180.0; }
 // radからdegreeへの変換
 double rad_to_deg(const double &num) { return num * 180 / M_PI; }
 
-// 緯度経度を平面直角座標に変換する(chatGPTくんにやってもらった。自分で書いたのは一番下にある。)
-// std::pair<double, double> calc_xy(double phi_deg, double lambda_deg, double
-// phi0_deg, double lambda0_deg) {
-//   // 緯度経度・平面直角座標系原点をラジアンに直す
-//   double phi_rad = phi_deg * M_PI / 180.0;
-//   double lambda_rad = lambda_deg * M_PI / 180.0;
-//   double phi0_rad = phi0_deg * M_PI / 180.0;
-//   double lambda0_rad = lambda0_deg * M_PI / 180.0;
-
-//   // 補助関数
-//   auto A_array = [](double n) {
-//     std::array<double, 6> A = {
-//         1 + std::pow(n, 2) / 4. + std::pow(n, 4) / 64.,
-//         -(3. / 2) * (n - std::pow(n, 3) / 8. - std::pow(n, 5) / 64.),
-//         (15. / 16) * (std::pow(n, 2) - std::pow(n, 4) / 4.),
-//         -(35. / 48) * (std::pow(n, 3) - (5. / 16) * std::pow(n, 5)),
-//         (315. / 512) * std::pow(n, 4),
-//         -(693. / 1280) * std::pow(n, 5)};
-//     return A;
-//   };
-
-//   auto alpha_array = [](double n) {
-//     std::array<double, 6> alpha = {
-//         std::nan(""),
-//         (1. / 2) * n - (2. / 3) * std::pow(n, 2) + (5. / 16) * std::pow(n, 3)
-//         +
-//             (41. / 180) * std::pow(n, 4) - (127. / 288) * std::pow(n, 5),
-//         (13. / 48) * std::pow(n, 2) - (3. / 5) * std::pow(n, 3) +
-//             (557. / 1440) * std::pow(n, 4) + (281. / 630) * std::pow(n, 5),
-//         (61. / 240) * std::pow(n, 3) - (103. / 140) * std::pow(n, 4) +
-//             (15061. / 26880) * std::pow(n, 5),
-//         (49561. / 161280) * std::pow(n, 4) - (179. / 168) * std::pow(n, 5),
-//         (34729. / 80640) * std::pow(n, 5)};
-//     return alpha;
-//   };
-
-//   // 定数 (a, F: 世界測地系-測地基準系1980（GRS80）楕円体)
-//   double m0 = 0.9999;
-//   double a = 6378137.;
-//   double F = 298.257222101;
-
-//   // (1) n, A_i, alpha_iの計算
-//   double n = 1. / (2 * F - 1);
-//   auto A = A_array(n);
-//   auto alpha = alpha_array(n);
-
-//   // (2), S, Aの計算
-//   double A_ = (m0 * a) / (1. + n) * A[0]; // [m]
-//   double S_ =
-//       (m0 * a) / (1. + n) *
-//       (A[0] * phi0_rad + A[1] * std::sin(2 * phi0_rad) +
-//        A[2] * std::sin(4 * phi0_rad) + A[3] * std::sin(6 * phi0_rad) +
-//        A[4] * std::sin(8 * phi0_rad) + A[5] * std::sin(10 * phi0_rad)); //
-//        [m]
-
-//   // (3) lambda_c, lambda_sの計算
-//   double lambda_c = std::cos(lambda_rad - lambda0_rad);
-//   double lambda_s = std::sin(lambda_rad - lambda0_rad);
-
-//   // (4) t, t_の計算
-//   double t = std::sinh(
-//       std::atanh(std::sin(phi_rad)) -
-//       ((2 * std::sqrt(n)) / (1 + n)) *
-//           std::atanh(((2 * std::sqrt(n)) / (1 + n)) * std::sin(phi_rad)));
-//   double t_ = std::sqrt(1 + t * t);
-
-//   // (5) xi', eta'の計算
-//   double xi2 = std::atanh(t / lambda_c); // [rad]
-//   double eta2 = std::atanh(lambda_s / t_);
-
-//   // (6) x, yの計算
-//   double x =
-//       A_ * (xi2 + alpha[1] * std::sin(2 * xi2) + alpha[2] * std::sin(4 * xi2)
-//       +
-//             alpha[3] * std::sin(6 * xi2) + alpha[4] * std::sin(8 * xi2) +
-//             alpha[5] * std::sin(10 * xi2)) -
-//       S_; // [m]
-//   double y =
-//       A_ * (eta2 + alpha[1] * std::cos(2 * xi2) + alpha[2] * std::cos(4 *
-//       xi2) +
-//             alpha[3] * std::cos(6 * xi2) + alpha[4] * std::cos(8 * xi2) +
-//             alpha[5] * std::cos(10 * xi2)); // [m]
-
-//   return {x, y}; // [m]
+// // 三平方の定理verのcalc_xy
+// std::pair<double, double> calc_xy(double phi_deg, double lambda_deg,
+//                                   double phi0_deg, double lambda0_deg) {
+//   double difference_lon = lambda_deg - lambda0_deg;
+//   double difference_lat = phi_deg - phi0_deg;
+//   double x = difference_lon * radius_e;
+//   double y = difference_lat * radius_e;
+//   return {x, y};
 // }
-
-// 三平方の定理verのcalc_xy
-std::pair<double, double> calc_xy(double phi_deg, double lambda_deg,
-                                  double phi0_deg, double lambda0_deg) {
-  double difference_lon = lambda_deg - lambda0_deg;
-  double difference_lat = phi_deg - phi0_deg;
-  double x = difference_lon * radius_e;
-  double y = difference_lat * radius_e;
+// 球面verのcalc_xy(new!!)
+std::pair<double, double> calc_xy(double t_lat, double t_lon, double m_lat,
+                                  double m_lon) {
+  double cos_n_x = sin(m_lat) * sin(m_lat) +
+                   cos(m_lat) * cos(m_lat) * cos(t_lon - m_lon); // なす角のcos
+  double x = radius_e * acos(cos_n_x);
+  double cos_n_y = sin(t_lat) * sin(m_lat) +
+                   cos(t_lat) * cos(m_lat) * cos(m_lon - m_lon); // なす角のcos
+  double y = radius_e * acos(cos_n_y);
   return {x, y};
 }
-//球面verのcalc_xy(new!!)
-std::pair<double, double> calc_xy(double t_lat, double t_lon,
-    double m_lat, double m_lon) {
-    double cos_n_x = sin(m_lat)*sin(m_lat) + cos(m_lat)*cos(m_lat)*cos(t_lon - m_lon);//なす角のcos
-    double x = radius_e * acos(cos_n_x);
-    double cos_n_y = sin(t_lat)*sin(m_lat) + cos(t_lat)*cos(m_lat)*cos(m_lon - m_lon);//なす角のcos
-    double y = radius_e * acos(cos_n_y);
-    return {x,y};
-}
 
-    //lat→phi,lon→lambda
-    //  緯度経度を平面直角座標に変換する
-    // - input:
-    //     (phi_deg, lambda_deg):
-    //変換したい緯度・経度[度]（分・秒でなく小数であることに注意）
-    //     (phi0_deg, lambda0_deg):
-    //平面直角座標系原点の緯度・経度[度]（分・秒でなく小数であることに注意）
-    // - output:
-    //     x: 変換後の平面直角座標[m]
-    //     y: 変換後の平面直角座標[m]
-
+// lat→phi,lon→lambda
+//   緯度経度を平面直角座標に変換する
+//  - input:
+//      (phi_deg, lambda_deg):
+// 変換したい緯度・経度[度]（分・秒でなく小数であることに注意）
+//      (phi0_deg, lambda0_deg):
+// 平面直角座標系原点の緯度・経度[度]（分・秒でなく小数であることに注意）
+//  - output:
+//      x: 変換後の平面直角座標[m]
+//      y: 変換後の平面直角座標[m]
 
 // 時計回りに回転する関数
 std::pair<double, double>
@@ -146,6 +61,7 @@ Rotation_clockwise_xy(std::pair<double, double> vec_xy, double radian) {
 
 void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
                 GPS &gps, const Servo &servo_r, const Servo &servo_l) {
+  sleep_ms(2000);
   //------ちゃんと動くか確認するためのコード-----
   // std::vector<float> mag_vector = {0.0,0.0,0.0};
   // auto gps_data_goal = {0.0,0.0};//{lon,lat}で入っている想定
@@ -208,41 +124,54 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
       goal_angle_cansat_basis < (5 * M_PI / 4)) // 正面にゴールがある時の指示
   {
     printf("front!!");
-    while (right_count != 0 && left_count !=0) // もう巻き取っている場合はより戻して左右均等にする。
+    while (right_count != 0 &&
+           left_count !=
+               0) // もう巻き取っている場合はより戻して左右均等にする。
     {
       if (right_count > 0) {
         servo_r.left_turn();
-        sleep_ms(2000);
-        right_count = right_count - 1;
+        sleep_ms(2000 * right_count);
+        right_count = 0;
         servo_r.stop_turn();
       }
       if (left_count > 0) {
         servo_l.right_turn();
-        sleep_ms(2000);
-        left_count = left_count - 1;
+        sleep_ms(2000 * left_count);
+        left_count = 0;
         servo_l.stop_turn();
       }
     }
-  } else if ((1 * M_PI / 4) <= goal_angle_cansat_basis && goal_angle_cansat_basis < (3 * M_PI / 4)) // 右にゴールがあるときの指示
+  } else if ((1 * M_PI / 4) <= goal_angle_cansat_basis &&
+             goal_angle_cansat_basis < (3 * M_PI / 4) &&
+             right_count <= 4) // 右にゴールがあるときの指示
   {
     printf("right!!");
     servo_r.right_turn();
     sleep_ms(2000);
     right_count = right_count + 1;
     servo_r.stop_turn();
-  } else if ((5 * M_PI / 4) <= goal_angle_cansat_basis && goal_angle_cansat_basis < (7 * M_PI / 4)) // 左にゴールがあるときの指示
+  } else if ((5 * M_PI / 4) <= goal_angle_cansat_basis &&
+             goal_angle_cansat_basis < (7 * M_PI / 4) &&
+             left_count <= 4) // 左にゴールがあるときの指示
   {
     printf("left!!");
     servo_l.left_turn();
     sleep_ms(2000);
     left_count = left_count + 1;
     servo_l.stop_turn();
-  } else if (goal_angle_cansat_basis < (1 * M_PI / 4) || (7 * M_PI / 4) <= goal_angle_cansat_basis) // 後ろにゴールがあるときの指示
+  } else if ((7 * M_PI / 4) <= goal_angle_cansat_basis &&
+             right_count <= 4) // 後ろにゴールがあるときの指示
   {
     printf("sharp right!!");
     servo_r.right_turn();
     sleep_ms(4000);
     right_count = right_count + 2;
+    servo_r.stop_turn();
+  } else if (goal_angle_cansat_basis <= (1 * M_PI / 4) && left_count <= 4) {
+    printf("sharp left!!");
+    servo_r.left_turn();
+    sleep_ms(4000);
+    left_count = left_count + 2;
     servo_r.stop_turn();
   }
 
@@ -370,6 +299,91 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
 //     right_count = right_count + 2;
 // }
 
+// 緯度経度を平面直角座標に変換する(chatGPTくんにやってもらった。自分で書いたのは一番下にある。)
+// std::pair<double, double> calc_xy(double phi_deg, double lambda_deg, double
+// phi0_deg, double lambda0_deg) {
+//   // 緯度経度・平面直角座標系原点をラジアンに直す
+//   double phi_rad = phi_deg * M_PI / 180.0;
+//   double lambda_rad = lambda_deg * M_PI / 180.0;
+//   double phi0_rad = phi0_deg * M_PI / 180.0;
+//   double lambda0_rad = lambda0_deg * M_PI / 180.0;
+
+//   // 補助関数
+//   auto A_array = [](double n) {
+//     std::array<double, 6> A = {
+//         1 + std::pow(n, 2) / 4. + std::pow(n, 4) / 64.,
+//         -(3. / 2) * (n - std::pow(n, 3) / 8. - std::pow(n, 5) / 64.),
+//         (15. / 16) * (std::pow(n, 2) - std::pow(n, 4) / 4.),
+//         -(35. / 48) * (std::pow(n, 3) - (5. / 16) * std::pow(n, 5)),
+//         (315. / 512) * std::pow(n, 4),
+//         -(693. / 1280) * std::pow(n, 5)};
+//     return A;
+//   };
+
+//   auto alpha_array = [](double n) {
+//     std::array<double, 6> alpha = {
+//         std::nan(""),
+//         (1. / 2) * n - (2. / 3) * std::pow(n, 2) + (5. / 16) * std::pow(n, 3)
+//         +
+//             (41. / 180) * std::pow(n, 4) - (127. / 288) * std::pow(n, 5),
+//         (13. / 48) * std::pow(n, 2) - (3. / 5) * std::pow(n, 3) +
+//             (557. / 1440) * std::pow(n, 4) + (281. / 630) * std::pow(n, 5),
+//         (61. / 240) * std::pow(n, 3) - (103. / 140) * std::pow(n, 4) +
+//             (15061. / 26880) * std::pow(n, 5),
+//         (49561. / 161280) * std::pow(n, 4) - (179. / 168) * std::pow(n, 5),
+//         (34729. / 80640) * std::pow(n, 5)};
+//     return alpha;
+//   };
+
+//   // 定数 (a, F: 世界測地系-測地基準系1980（GRS80）楕円体)
+//   double m0 = 0.9999;
+//   double a = 6378137.;
+//   double F = 298.257222101;
+
+//   // (1) n, A_i, alpha_iの計算
+//   double n = 1. / (2 * F - 1);
+//   auto A = A_array(n);
+//   auto alpha = alpha_array(n);
+
+//   // (2), S, Aの計算
+//   double A_ = (m0 * a) / (1. + n) * A[0]; // [m]
+//   double S_ =
+//       (m0 * a) / (1. + n) *
+//       (A[0] * phi0_rad + A[1] * std::sin(2 * phi0_rad) +
+//        A[2] * std::sin(4 * phi0_rad) + A[3] * std::sin(6 * phi0_rad) +
+//        A[4] * std::sin(8 * phi0_rad) + A[5] * std::sin(10 * phi0_rad)); //
+//        [m]
+
+//   // (3) lambda_c, lambda_sの計算
+//   double lambda_c = std::cos(lambda_rad - lambda0_rad);
+//   double lambda_s = std::sin(lambda_rad - lambda0_rad);
+
+//   // (4) t, t_の計算
+//   double t = std::sinh(
+//       std::atanh(std::sin(phi_rad)) -
+//       ((2 * std::sqrt(n)) / (1 + n)) *
+//           std::atanh(((2 * std::sqrt(n)) / (1 + n)) * std::sin(phi_rad)));
+//   double t_ = std::sqrt(1 + t * t);
+
+//   // (5) xi', eta'の計算
+//   double xi2 = std::atanh(t / lambda_c); // [rad]
+//   double eta2 = std::atanh(lambda_s / t_);
+
+//   // (6) x, yの計算
+//   double x =
+//       A_ * (xi2 + alpha[1] * std::sin(2 * xi2) + alpha[2] * std::sin(4 * xi2)
+//       +
+//             alpha[3] * std::sin(6 * xi2) + alpha[4] * std::sin(8 * xi2) +
+//             alpha[5] * std::sin(10 * xi2)) -
+//       S_; // [m]
+//   double y =
+//       A_ * (eta2 + alpha[1] * std::cos(2 * xi2) + alpha[2] * std::cos(4 *
+//       xi2) +
+//             alpha[3] * std::cos(6 * xi2) + alpha[4] * std::cos(8 * xi2) +
+//             alpha[5] * std::cos(10 * xi2)); // [m]
+
+//   return {x, y}; // [m]
+// }
 // 自分で書いたはいいものの、自信がなくなって没になった関数たちの墓場
 
 /*
