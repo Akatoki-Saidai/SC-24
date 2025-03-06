@@ -102,7 +102,7 @@ double rad_to_deg(const double &num) { return num * 180 / M_PI; }
 //   return {x, y}; // [m]
 // }
 
-// 三角関数verのcalc_xy
+// 三平方の定理verのcalc_xy
 std::pair<double, double> calc_xy(double phi_deg, double lambda_deg,
                                   double phi0_deg, double lambda0_deg) {
   double difference_lon = lambda_deg - lambda0_deg;
@@ -111,6 +111,27 @@ std::pair<double, double> calc_xy(double phi_deg, double lambda_deg,
   double y = difference_lat * radius_e;
   return {x, y};
 }
+// //球面verのcalc_xy(new!!)
+// std::pair<double, double> calc_xy(double t_lat, double t_lon,
+//     double m_lat, double m_lon) {
+//     double cos_n_x = sin(m_lat)*sin(m_lat) + cos(m_lat)*cos(m_lat)*cos(t_lon - m_lon);//なす角のcos
+//     double x = radius_e * acos(cos_n_x);
+//     double cos_n_y = sin(t_lat)*sin(m_lat) + cos(t_lat)*cos(m_lat)*cos(m_lon - m_lon);//なす角のcos
+//     double y = radius_e * acos(cos_n_y);
+//     return {x,y};
+// }
+
+    //lat→phi,lon→lambda
+    //  緯度経度を平面直角座標に変換する
+    // - input:
+    //     (phi_deg, lambda_deg):
+    //変換したい緯度・経度[度]（分・秒でなく小数であることに注意）
+    //     (phi0_deg, lambda0_deg):
+    //平面直角座標系原点の緯度・経度[度]（分・秒でなく小数であることに注意）
+    // - output:
+    //     x: 変換後の平面直角座標[m]
+    //     y: 変換後の平面直角座標[m]
+
 
 // 時計回りに回転する関数
 std::pair<double, double>
