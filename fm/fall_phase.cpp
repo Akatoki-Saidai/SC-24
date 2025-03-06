@@ -111,15 +111,15 @@ std::pair<double, double> calc_xy(double phi_deg, double lambda_deg,
   double y = difference_lat * radius_e;
   return {x, y};
 }
-// //球面verのcalc_xy(new!!)
-// std::pair<double, double> calc_xy(double t_lat, double t_lon,
-//     double m_lat, double m_lon) {
-//     double cos_n_x = sin(m_lat)*sin(m_lat) + cos(m_lat)*cos(m_lat)*cos(t_lon - m_lon);//なす角のcos
-//     double x = radius_e * acos(cos_n_x);
-//     double cos_n_y = sin(t_lat)*sin(m_lat) + cos(t_lat)*cos(m_lat)*cos(m_lon - m_lon);//なす角のcos
-//     double y = radius_e * acos(cos_n_y);
-//     return {x,y};
-// }
+//球面verのcalc_xy(new!!)
+std::pair<double, double> calc_xy(double t_lat, double t_lon,
+    double m_lat, double m_lon) {
+    double cos_n_x = sin(m_lat)*sin(m_lat) + cos(m_lat)*cos(m_lat)*cos(t_lon - m_lon);//なす角のcos
+    double x = radius_e * acos(cos_n_x);
+    double cos_n_y = sin(t_lat)*sin(m_lat) + cos(t_lat)*cos(m_lat)*cos(m_lon - m_lon);//なす角のcos
+    double y = radius_e * acos(cos_n_y);
+    return {x,y};
+}
 
     //lat→phi,lon→lambda
     //  緯度経度を平面直角座標に変換する
@@ -208,9 +208,7 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
       goal_angle_cansat_basis < (5 * M_PI / 4)) // 正面にゴールがある時の指示
   {
     printf("front!!");
-    while (right_count != 0 &&
-           left_count !=
-               0) // もう巻き取っている場合はより戻して左右均等にする。
+    while (right_count != 0 && left_count !=0) // もう巻き取っている場合はより戻して左右均等にする。
     {
       if (right_count > 0) {
         servo_r.left_turn();
@@ -225,27 +223,21 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
         servo_l.stop_turn();
       }
     }
-  } else if ((1 * M_PI / 4) <= goal_angle_cansat_basis &&
-             goal_angle_cansat_basis <
-                 (3 * M_PI / 4)) // 右にゴールがあるときの指示
+  } else if ((1 * M_PI / 4) <= goal_angle_cansat_basis && goal_angle_cansat_basis < (3 * M_PI / 4)) // 右にゴールがあるときの指示
   {
     printf("right!!");
     servo_r.right_turn();
     sleep_ms(2000);
     right_count = right_count + 1;
     servo_r.stop_turn();
-  } else if ((5 * M_PI / 4) <= goal_angle_cansat_basis &&
-             goal_angle_cansat_basis <
-                 (7 * M_PI / 4)) // 左にゴールがあるときの指示
+  } else if ((5 * M_PI / 4) <= goal_angle_cansat_basis && goal_angle_cansat_basis < (7 * M_PI / 4)) // 左にゴールがあるときの指示
   {
     printf("left!!");
     servo_l.left_turn();
     sleep_ms(2000);
     left_count = left_count + 1;
     servo_l.stop_turn();
-  } else if (goal_angle_cansat_basis < (1 * M_PI / 4) ||
-             (7 * M_PI / 4) <=
-                 goal_angle_cansat_basis) // 後ろにゴールがあるときの指示
+  } else if (goal_angle_cansat_basis < (1 * M_PI / 4) || (7 * M_PI / 4) <= goal_angle_cansat_basis) // 後ろにゴールがあるときの指示
   {
     printf("sharp right!!");
     servo_r.right_turn();
