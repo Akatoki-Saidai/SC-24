@@ -29,11 +29,11 @@ GPS::GPS(Flash &flash, uart_inst_t *uart_hw)
   // gpio_set_function(tx_pin, GPIO_FUNC_UART);
   // gpio_set_function(rx_pin, GPIO_FUNC_UART);
 
-  // フロー制御(受信準備が終わるまで送信しないで待つ機能)を無効にする
-  uart_set_hw_flow(_uart_hw, false, false);
-
   // UART通信の設定をする
   uart_set_format(_uart_hw, DataBits, StopBits, UartParity);
+
+  // フロー制御(受信準備が終わるまで送信しないで待つ機能)を無効にする
+  uart_set_hw_flow(_uart_hw, false, false);
 
   ((_uart_hw == uart1) ? gps::recv1 : gps::recv0).resize(_read_len);
 
@@ -58,6 +58,16 @@ GPS::GPS(Flash &flash, uart_inst_t *uart_hw)
 
   // UARTの割り込み処理を受信のみ有効にする
   uart_set_irq_enables(_uart_hw, true, false);
+
+  // 空測定
+  printf("gps start initial measurement\n");
+  _flash.write("gps start initial measurement\n");
+  for (int i = 0; i < 20; ++i) {
+    read();
+    sleep_ms(100);
+  }
+  printf("gps finish initial measurement\n");
+  _flash.write("gps finish initial measurement\n");
 }
 
 // uart0のときにGPSの値をdequeに追加-->古い値を削除
@@ -65,6 +75,7 @@ inline void gps::read_raw0() {
   while (uart_is_readable(uart0)) {
     gps::recv0.push_back(uart_getc(uart0));
     gps::recv0.pop_front();
+    printf(">%c", gps::recv0.back());
   }
 }
 // uart1のときにGPSの値をdequeに追加-->古い値を削除
@@ -72,6 +83,7 @@ inline void gps::read_raw1() {
   while (uart_is_readable(uart1)) {
     gps::recv1.push_back(uart_getc(uart1));
     gps::recv1.pop_front();
+    printf(">%c", gps::recv1.back());
   }
 }
 
@@ -157,6 +169,8 @@ GPS::Measurement_t GPS::read() {
       if (split_data.at(9) != "N") {
         output_velocity(split_data.at(5));
       }
+    } else {
+      printf("gps_other: %s\n", nmea.c_str());
     }
   }
 

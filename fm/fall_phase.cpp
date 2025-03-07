@@ -4,8 +4,8 @@
 #include <pico/time.h>
 
 // どれだけ巻いたかを記録するための変数
-int right_count = 0; // 右に曲がった時のカウント
-int left_count = 0;  // 左に曲がった時のカウント
+int servo_right_count = 0; // 右に曲がった時のカウント
+int servo_left_count = 0;  // 左に曲がった時のカウント
 
 constexpr double radius_e = 6378000; // 地球半径(m)
 
@@ -69,11 +69,17 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
   auto bno_data = bno055.read(); //{accel,grv,mag}の順番で入っている想定
   auto gps_data = gps.read();
   auto bmp_data = bmp280.read();
-  std::pair<double, double> gps_data_cansat = {30.4149035, 130.9037629};
-  //   std::pair<double, double> gps_data_cansat = {gps_data.lat, gps_data.lon};
+  //   std::pair<double, double> gps_data_cansat = {30.4149035, 130.9037629};
+  std::pair<double, double> gps_data_cansat = {gps_data.lat, gps_data.lon};
   std::pair<double, double> gps_data_goal = {30.4140853,
                                              130.9038578}; // ここは自分で入力
   //-------------------------------------------
+  printf("lat: %f, lon: %f\n", gps_data_cansat.first, gps_data_cansat.second);
+  if (gps_data_cansat.first == -1024.0 || gps_data_cansat.second == -1024.0) {
+    printf("gps_data is abnormal\n");
+    sleep_ms(1000);
+    return;
+  }
 
   // 処理に使うデータ
   double g_lon = std::get<0>(gps_data_goal);   // ゴールの経度
@@ -126,66 +132,67 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
       goal_angle_cansat_basis < (5 * M_PI / 4)) // 正面にゴールがある時の指示
   {
     printf("front!!");
-    while (right_count != 0 ||
-           left_count !=
+    while (servo_right_count != 0 ||
+           servo_left_count !=
                0) // もう巻き取っている場合はより戻して左右均等にする。
     {
-      if (right_count > 0) {
+      if (servo_right_count > 0) {
         servo_r.left_turn();
-        sleep_ms(2000 * right_count);
-        right_count = 0;
+        sleep_ms(2000 * servo_right_count);
+        servo_right_count = 0;
         servo_r.stop_turn();
       }
-      if (left_count > 0) {
+      if (servo_left_count > 0) {
         servo_l.left_turn();
-        sleep_ms(2000 * left_count);
-        left_count = 0;
+        sleep_ms(2000 * servo_left_count);
+        servo_left_count = 0;
         servo_l.stop_turn();
       }
     }
   } else if ((1 * M_PI / 4) <= goal_angle_cansat_basis &&
              goal_angle_cansat_basis < (3 * M_PI / 4) &&
-             right_count <= 3) // 右にゴールがあるときの指示
+             servo_right_count <= 3) // 右にゴールがあるときの指示
   {
     printf("right!!");
     servo_r.right_turn();
     sleep_ms(2000);
-    right_count = right_count + 1;
+    servo_right_count = servo_right_count + 1;
     servo_r.stop_turn();
   } else if ((5 * M_PI / 4) <= goal_angle_cansat_basis &&
              goal_angle_cansat_basis < (7 * M_PI / 4) &&
-             left_count <= 3) // 左にゴールがあるときの指示
+             servo_left_count <= 3) // 左にゴールがあるときの指示
   {
     printf("left!!");
     servo_l.right_turn();
     sleep_ms(2000);
-    left_count = left_count + 1;
+    servo_left_count = servo_left_count + 1;
     servo_l.stop_turn();
   } else if ((7 * M_PI / 4) <= goal_angle_cansat_basis &&
-             left_count <= 3) // 後ろにゴールがあるときの指示
+             servo_left_count <= 3) // 後ろにゴールがあるときの指示
   {
     printf("sharp left!!");
     servo_l.right_turn();
     sleep_ms(4000);
-    right_count = right_count + 2;
+    servo_left_count = servo_left_count + 2;
     servo_l.stop_turn();
-  } else if (goal_angle_cansat_basis <= (1 * M_PI / 4) && right_count <= 3) {
+  } else if (goal_angle_cansat_basis <= (1 * M_PI / 4) &&
+             servo_right_count <= 3) {
     printf("sharp right!!");
     servo_r.right_turn();
     sleep_ms(4000);
-    right_count = right_count + 2;
+    servo_right_count = servo_right_count + 2;
     servo_r.stop_turn();
   }
 
-  printf("right count: %i\n", right_count);
-  printf("left count: %i\n", left_count);
-  sleep_ms(3000);
+  printf("right count: %i\n", servo_right_count);
+  printf("left count: %i\n", servo_left_count);
+  //   sleep_ms(3000);
 
   if (distance < 10) {
     phase = Phase::Goal;
     printf("enter goal_phase");
     flash.write("enter:goal_phase!!");
-    sleep_ms(5000);
+    // sleep_ms(5000);
   }
   //   本番の緯度経度を踏まえて採用するか考える
   //   if (g_lat < c_lat) {
