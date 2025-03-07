@@ -61,7 +61,7 @@ Rotation_clockwise_xy(std::pair<double, double> vec_xy, double radian) {
 
 void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
                 GPS &gps, const Servo &servo_r, const Servo &servo_l) {
-  sleep_ms(2000);
+  sleep_ms(100);
   //------ちゃんと動くか確認するためのコード-----
   // std::vector<float> mag_vector = {0.0,0.0,0.0};
   // auto gps_data_goal = {0.0,0.0};//{lon,lat}で入っている想定
