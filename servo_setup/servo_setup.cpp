@@ -20,9 +20,9 @@ int main() {
   sleep_ms(100);
   // ↓ここを変えて
   // servo_r.right_turn();
-  servo_r.left_turn();
+  // servo_r.left_turn();
   // servo_l.right_turn();
-  // servo_l.left_turn();
+  servo_l.left_turn();
   sleep_ms(8000);
 
   // while (true) {

@@ -61,6 +61,16 @@ BNO055::BNO055(Flash &flash, i2c_inst_t *i2c_port, uint8_t i2c_addr)
   sleep_ms(100);
 
   // メモ:SC-17のコードでもdata[1] = 0x0C = (int)12となっている??
+
+  // 何回か空測定
+  printf("bno055 start initial measurement\n");
+  _flash.write("bno055 start initial measurement\n");
+  for (int i = 0; i < 20; ++i) {
+    read();
+    sleep_ms(100);
+  }
+  printf("bno055 finish initial measurement\n");
+  _flash.write("bno055 finish initial measurement\n");
 }
 
 BNO055::~BNO055() {}

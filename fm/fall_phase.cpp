@@ -131,13 +131,13 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
                0) // もう巻き取っている場合はより戻して左右均等にする。
     {
       if (right_count > 0) {
-        // servo_r.left_turn();
+        servo_r.left_turn();
         sleep_ms(2000 * right_count);
         right_count = 0;
         servo_r.stop_turn();
       }
       if (left_count > 0) {
-        // servo_l.left_turn();
+        servo_l.left_turn();
         sleep_ms(2000 * left_count);
         left_count = 0;
         servo_l.stop_turn();
@@ -148,7 +148,7 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
              right_count <= 3) // 右にゴールがあるときの指示
   {
     printf("right!!");
-    // servo_r.right_turn();
+    servo_r.right_turn();
     sleep_ms(2000);
     right_count = right_count + 1;
     servo_r.stop_turn();
@@ -157,7 +157,7 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
              left_count <= 3) // 左にゴールがあるときの指示
   {
     printf("left!!");
-    // servo_l.right_turn();
+    servo_l.right_turn();
     sleep_ms(2000);
     left_count = left_count + 1;
     servo_l.stop_turn();
@@ -165,13 +165,13 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
              left_count <= 3) // 後ろにゴールがあるときの指示
   {
     printf("sharp left!!");
-    // servo_l.right_turn();
+    servo_l.right_turn();
     sleep_ms(4000);
     right_count = right_count + 2;
-    servo_r.stop_turn();
+    servo_l.stop_turn();
   } else if (goal_angle_cansat_basis <= (1 * M_PI / 4) && right_count <= 3) {
     printf("sharp right!!");
-    // servo_r.right_turn();
+    servo_r.right_turn();
     sleep_ms(4000);
     right_count = right_count + 2;
     servo_r.stop_turn();
