@@ -65,29 +65,32 @@ int main() {
   // GPSのセットアップ
   GPS gps(flash, uart0);
 
-  Phase phase = Phase::Fall;
+  Phase phase = Phase::Fall; ////////////////////////////
 
   // ************************************************** //
   //                        loop                        //
   // ************************************************** //
+  printf("測定を開始します\n");
+  sleep_ms(1000);
   while (true) {
     try {
-      // sleep_ms(5000);
-      //   bmp280.read();
+      // sleep_ms(100);
+      // bmp280.read();
       //   bno055.read();
 
       //   gps.read();
       // servo_l.left_turn();
-      // servo_r.left_turn();
       // gpio_put(9, 1);
       // sleep_ms(2000);
       // servo_l.stop_turn();
       // servo_r.stop_turn();
+      // sleep_ms(2000);
       // servo_l.right_turn();
       // servo_r.right_turn();
       // sleep_ms(2000);
       // servo_l.stop_turn();
       // servo_r.stop_turn();
+      // sleep_ms(2000);
       // return 0;
       // sd.write("aiueo");
       // gpio_put(9, 0);

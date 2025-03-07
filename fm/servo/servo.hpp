@@ -20,6 +20,7 @@ public:
   void left_turn() const;
   void right_turn() const;
   void stop_turn() const;
+  void test_turn() const;
 
 private:
   Flash &_flash; // 出力用のフラッシュメモリ

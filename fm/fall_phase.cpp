@@ -1,13 +1,11 @@
 #include "fall_phase.hpp"
 #include <cmath>
 #include <cstdlib>
+#include <pico/time.h>
 
 // どれだけ巻いたかを記録するための変数
 int right_count = 0; // 右に曲がった時のカウント
 int left_count = 0;  // 左に曲がった時のカウント
-
-int basic_right_count = 0;
-int basic_left_count = 0;
 
 constexpr double radius_e = 6378000; // 地球半径(m)
 
@@ -71,10 +69,10 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
   auto bno_data = bno055.read(); //{accel,grv,mag}の順番で入っている想定
   auto gps_data = gps.read();
   auto bmp_data = bmp280.read();
-  std::pair<double, double> gps_data_cansat = {30.414129, 130.904176};
+  std::pair<double, double> gps_data_cansat = {30.4149078, 130.9038885};
   //   std::pair<double, double> gps_data_cansat = {gps_data.lat, gps_data.lon};
-  std::pair<double, double> gps_data_goal = {30.413835,
-                                             130.903371}; // ここは自分で入力
+  std::pair<double, double> gps_data_goal = {30.4143231,
+                                             130.9039502}; // ここは自分で入力
   //-------------------------------------------
 
   // 処理に使うデータ
@@ -85,7 +83,7 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
   std::pair<double, double> North_xy = {
       bno_data.mag[0], bno_data.mag[1]}; // cansatから見た北の方向(xy平面)
   std::pair<double, double> Cansat_forward_xy = {
-      1.0,
+      0.0,
       1.0}; // 正面をx軸の方としている(これはbnoの向き次第、違ったら適宜変更)
   // cansatを原点とした座標でgoalを表す
   std::pair<double, double> goal_xy = calc_xy(g_lat, g_lon, c_lat, c_lon);
@@ -178,8 +176,10 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
   if (distance < 10) {
     phase = Phase::Goal;
     printf("enter goal_phase");
+    flash.write("enter:goal_phase!!");
     sleep_ms(5000);
   }
+  //   本番の緯度経度を踏まえて採用するか考える
   //   if (g_lat < c_lat) {
   //     phase = Phase::Goal;
   //     printf("enter goal_phase");
