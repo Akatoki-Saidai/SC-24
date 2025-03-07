@@ -52,7 +52,7 @@ void Servo::right_turn() const {
   printf("servo right_turn\n");
 
   // パルス幅を設定(1000[us]~2000[us]で動作するらしい)
-  double pulse_width = 1000; //[us]
+  double pulse_width = 1600; //[us]
 
   // uint slice_num = pwm_gpio_to_slice_num(pin);  //
   // これを使っていないのは本当に正常？
@@ -67,7 +67,7 @@ void Servo::right_turn() const {
 void Servo::stop_turn() const {
 
   // パルス幅を設定(1000[us]~2000[us]で動作するらしい)
-  double pulse_width = 1500; //[us]
+  double pulse_width = 1800; //[us]
 
   // uint slice_num = pwm_gpio_to_slice_num(pin);  //
   // これを使っていないのは本当に正常？

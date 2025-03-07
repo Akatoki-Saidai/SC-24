@@ -69,10 +69,10 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
   auto bno_data = bno055.read(); //{accel,grv,mag}の順番で入っている想定
   auto gps_data = gps.read();
   auto bmp_data = bmp280.read();
-  std::pair<double, double> gps_data_cansat = {30.4149078, 130.9038885};
+  std::pair<double, double> gps_data_cansat = {30.4149035, 130.9037629};
   //   std::pair<double, double> gps_data_cansat = {gps_data.lat, gps_data.lon};
-  std::pair<double, double> gps_data_goal = {30.4143231,
-                                             130.9039502}; // ここは自分で入力
+  std::pair<double, double> gps_data_goal = {30.4140853,
+                                             130.9038578}; // ここは自分で入力
   //-------------------------------------------
 
   // 処理に使うデータ
@@ -82,9 +82,12 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
   double c_lat = std::get<1>(gps_data_cansat); // 自分の緯度
   std::pair<double, double> North_xy = {
       bno_data.mag[0], bno_data.mag[1]}; // cansatから見た北の方向(xy平面)
+  //   if (North_xy.first == 0.0 && North_xy.second == 0.0) {
+  //     return;
+  //   } // bnoがまだちゃんとしていないときは抜ける
   std::pair<double, double> Cansat_forward_xy = {
-      0.0,
-      1.0}; // 正面をx軸の方としている(これはbnoの向き次第、違ったら適宜変更)
+      1.0,
+      0.0}; // 正面をx軸の方としている(これはbnoの向き次第、違ったら適宜変更)
   // cansatを原点とした座標でgoalを表す
   std::pair<double, double> goal_xy = calc_xy(g_lat, g_lon, c_lat, c_lon);
   // 距離を求める
@@ -104,13 +107,14 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
   // step2-2:ズレている分だけ基底を回転させる(成分は反時計回転なので-1をかけてあげる)
   std::pair<double, double> goal_xy_cansat_basis =
       Rotation_clockwise_xy(goal_xy_north_basis, -1 * North_angle_cansat_basis);
+
   //------------------------------------------------------------------------------------------
   // ここまでの操作で、Cansat正面をx軸とした基底でgoalの方向を定めることができた。
   // あとは、その角度からどっちに舵を取ればいいかを決めればよい。
   // 角度を求める(0~2PI)
   double goal_angle_cansat_basis =
-      std::atan2(goal_xy_cansat_basis.second, goal_xy_cansat_basis.first);
-  goal_angle_cansat_basis = std::abs(goal_angle_cansat_basis - M_PI);
+      std::atan2(-1 * goal_xy_cansat_basis.second, goal_xy_cansat_basis.first);
+  goal_angle_cansat_basis = goal_angle_cansat_basis + M_PI;
   printf("angle: %f\n", goal_angle_cansat_basis);
   printf("angle_deg: %f\n", rad_to_deg(goal_angle_cansat_basis));
   flash.write("angle: %f\n", goal_angle_cansat_basis);
@@ -122,18 +126,18 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
       goal_angle_cansat_basis < (5 * M_PI / 4)) // 正面にゴールがある時の指示
   {
     printf("front!!");
-    while (right_count != 0 &&
+    while (right_count != 0 ||
            left_count !=
                0) // もう巻き取っている場合はより戻して左右均等にする。
     {
       if (right_count > 0) {
-        servo_r.left_turn();
+        // servo_r.left_turn();
         sleep_ms(2000 * right_count);
         right_count = 0;
         servo_r.stop_turn();
       }
       if (left_count > 0) {
-        servo_l.right_turn();
+        // servo_l.left_turn();
         sleep_ms(2000 * left_count);
         left_count = 0;
         servo_l.stop_turn();
@@ -141,37 +145,41 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
     }
   } else if ((1 * M_PI / 4) <= goal_angle_cansat_basis &&
              goal_angle_cansat_basis < (3 * M_PI / 4) &&
-             right_count <= 4) // 右にゴールがあるときの指示
+             right_count <= 3) // 右にゴールがあるときの指示
   {
     printf("right!!");
-    servo_r.right_turn();
+    // servo_r.right_turn();
     sleep_ms(2000);
     right_count = right_count + 1;
     servo_r.stop_turn();
   } else if ((5 * M_PI / 4) <= goal_angle_cansat_basis &&
              goal_angle_cansat_basis < (7 * M_PI / 4) &&
-             left_count <= 4) // 左にゴールがあるときの指示
+             left_count <= 3) // 左にゴールがあるときの指示
   {
     printf("left!!");
-    servo_l.left_turn();
+    // servo_l.right_turn();
     sleep_ms(2000);
     left_count = left_count + 1;
     servo_l.stop_turn();
   } else if ((7 * M_PI / 4) <= goal_angle_cansat_basis &&
-             right_count <= 4) // 後ろにゴールがあるときの指示
+             left_count <= 3) // 後ろにゴールがあるときの指示
   {
-    printf("sharp right!!");
-    servo_r.right_turn();
+    printf("sharp left!!");
+    // servo_l.right_turn();
     sleep_ms(4000);
     right_count = right_count + 2;
     servo_r.stop_turn();
-  } else if (goal_angle_cansat_basis <= (1 * M_PI / 4) && left_count <= 4) {
-    printf("sharp left!!");
-    servo_r.left_turn();
+  } else if (goal_angle_cansat_basis <= (1 * M_PI / 4) && right_count <= 3) {
+    printf("sharp right!!");
+    // servo_r.right_turn();
     sleep_ms(4000);
-    left_count = left_count + 2;
+    right_count = right_count + 2;
     servo_r.stop_turn();
   }
+
+  printf("right count: %i\n", right_count);
+  printf("left count: %i\n", left_count);
+  sleep_ms(3000);
 
   if (distance < 10) {
     phase = Phase::Goal;

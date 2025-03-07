@@ -27,18 +27,22 @@ int main() {
   Flash flash;
   // ピンをGNDに手動で繋げている場合
   if (gpio_get(15) == false) {
+    printf("flash print\n");
     flash.print(); // フラッシュメモリに保存されている全データを出力
     return 0;
   }
+  printf("flash NOT print\n");
+  sleep_ms(10000);
+
   flash.clear(); // フラッシュメモリのデータをリセット
   flash.write("flash init ok\n");
 
   // SDカードのセットアップ
   // SD sd;
 
-  Servo servo_l(flash, 26, 50); // 左のサーボ
+  Servo servo_l(flash, 27, 50); // 左のサーボ
   servo_l.start();
-  Servo servo_r(flash, 27, 50); // 右のサーボ
+  Servo servo_r(flash, 26, 50); // 右のサーボ
   servo_r.start();
 
   // I2Cのセットアップ
