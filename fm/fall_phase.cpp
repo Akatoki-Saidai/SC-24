@@ -86,7 +86,7 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
       bno_data.mag[0], bno_data.mag[1]}; // cansatから見た北の方向(xy平面)
   std::pair<double, double> Cansat_forward_xy = {
       1.0,
-      0.0}; // 正面をx軸の方としている(これはbnoの向き次第、違ったら適宜変更)
+      1.0}; // 正面をx軸の方としている(これはbnoの向き次第、違ったら適宜変更)
   // cansatを原点とした座標でgoalを表す
   std::pair<double, double> goal_xy = calc_xy(g_lat, g_lon, c_lat, c_lon);
   // 距離を求める
