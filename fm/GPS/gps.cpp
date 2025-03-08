@@ -29,11 +29,11 @@ GPS::GPS(Flash &flash, uart_inst_t *uart_hw)
   // gpio_set_function(tx_pin, GPIO_FUNC_UART);
   // gpio_set_function(rx_pin, GPIO_FUNC_UART);
 
-  // UART通信の設定をする
-  uart_set_format(_uart_hw, DataBits, StopBits, UartParity);
-
   // フロー制御(受信準備が終わるまで送信しないで待つ機能)を無効にする
   uart_set_hw_flow(_uart_hw, false, false);
+
+  // UART通信の設定をする
+  uart_set_format(_uart_hw, DataBits, StopBits, UartParity);
 
   ((_uart_hw == uart1) ? gps::recv1 : gps::recv0).resize(_read_len);
 
@@ -93,6 +93,11 @@ GPS::Measurement_t GPS::read() {
   if (recv.size() != _read_len)
     recv.resize(_read_len);
   _recv_copy = recv;
+  printf("recv_copu: ");
+  for (char c : _recv_copy) {
+    printf("%c", c);
+  }
+  printf("\n");
 
   //------------------------------
   // この部分を削除することで，データを受信できなかった時にエラーの値-1024ではなく前回受信した値が出力されます．

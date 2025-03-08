@@ -27,11 +27,12 @@ int main() {
   Flash flash;
   // ピンをGNDに手動で繋げている場合
   if (gpio_get(15) == false) {
-    printf("flash print\n");
+    printf("フラッシュメモリに保存されたデータを出力します\n");
     flash.print(); // フラッシュメモリに保存されている全データを出力
     return 0;
   }
-  printf("flash NOT print\n");
+  printf("フラッシュメモリのデータを全て削除します\n");
+  printf("データを出力したい場合は直ちにコードを抜いてください\n");
   sleep_ms(10000);
 
   flash.clear(); // フラッシュメモリのデータをリセット
@@ -62,6 +63,7 @@ int main() {
   BNO055 bno055(flash, i2c1);
 
   // UARTのセットアップ
+  // uart_init(uart0, 115200);
   uart_init(uart0, 38400);
   gpio_set_function(0, GPIO_FUNC_UART);
   gpio_set_function(1, GPIO_FUNC_UART);
