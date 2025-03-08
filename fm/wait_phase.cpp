@@ -13,7 +13,7 @@ void wait_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055) {
   printf("max_altitude: %f\n", max_alt);
   printf("altitude:%f\n", bmp_data.altitude);
   if (/*20 < accel_abs &&*/ 20 < bmp_data.altitude && bmp_data.altitude < 100 &&
-      2 < max_alt - bmp_data.altitude && max_alt - bmp_data.altitude < 30) {
+      3 < max_alt - bmp_data.altitude && max_alt - bmp_data.altitude < 30) {
     phase = Phase::Fall;
     gpio_put(13, true); // ジャイロモータ起動
     std::cout << "phase to fall!!" << std::endl;

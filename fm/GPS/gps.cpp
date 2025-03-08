@@ -43,7 +43,7 @@ GPS::GPS(Flash &flash, uart_inst_t *uart_hw)
   // ここから割り込み処理の設定
 
   // FIFO(受信したデータを一時的に保管する機能)をオフにし，1文字ずつ受信する
-  // uart_set_fifo_enabled(UART_ID, false);
+  uart_set_fifo_enabled(_uart_hw, false);
 
   uart_irq = (_uart_hw == uart0) ? UART0_IRQ : UART1_IRQ;
 
@@ -73,31 +73,37 @@ GPS::GPS(Flash &flash, uart_inst_t *uart_hw)
 // uart0のときにGPSの値をdequeに追加-->古い値を削除
 inline void gps::read_raw0() {
   while (uart_is_readable(uart0)) {
-    gps::recv0.push_back(uart_getc(uart0));
+    char c = uart_getc(uart0);
+    // printf(">%c", c);
+    gps::recv0.push_back(c);
     gps::recv0.pop_front();
-    printf(">%c", gps::recv0.back());
+    tight_loop_contents();
+    volatile int i = 0;
   }
 }
 // uart1のときにGPSの値をdequeに追加-->古い値を削除
 inline void gps::read_raw1() {
   while (uart_is_readable(uart1)) {
-    gps::recv1.push_back(uart_getc(uart1));
+    char c = uart_getc(uart1);
+    // printf(">%c", c);
+    gps::recv1.push_back(c);
     gps::recv1.pop_front();
-    printf(">%c", gps::recv1.back());
+    tight_loop_contents();
+    volatile int i = 0;
   }
 }
 
 // dequeに保存したGPSの値から数値を取り出す
 GPS::Measurement_t GPS::read() {
   std::deque<char> &recv = (_uart_hw == uart1) ? gps::recv1 : gps::recv0;
-  if (recv.size() != _read_len)
-    recv.resize(_read_len);
-  _recv_copy = recv;
   printf("recv_copu: ");
-  for (char c : _recv_copy) {
+  for (char c : recv) {
     printf("%c", c);
   }
   printf("\n");
+  if (recv.size() != _read_len)
+    recv.resize(_read_len);
+  _recv_copy = recv;
 
   //------------------------------
   // この部分を削除することで，データを受信できなかった時にエラーの値-1024ではなく前回受信した値が出力されます．

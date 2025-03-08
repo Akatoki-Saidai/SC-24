@@ -195,6 +195,7 @@ int main() {
             std::cout << "Error Code = " << static_cast<int>(error) << std::endl;
         }
     }
+    
 
     parser.getGPGGA().output(ofs_all_log);
     parser.getGPGLL().output(ofs_all_log);

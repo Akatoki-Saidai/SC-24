@@ -66,13 +66,14 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
   // auto gps_data_cansat = {0.0,0.0};
   //-------------------------------------------
   //------本番用のコード------------------------
+  //   gpio_put(13, true);            // ジャイロモータ起動
   auto bno_data = bno055.read(); //{accel,grv,mag}の順番で入っている想定
   auto gps_data = gps.read();
   auto bmp_data = bmp280.read();
   //   std::pair<double, double> gps_data_cansat = {30.4149035, 130.9037629};
   std::pair<double, double> gps_data_cansat = {gps_data.lat, gps_data.lon};
-  std::pair<double, double> gps_data_goal = {30.4140853,
-                                             130.9038578}; // ここは自分で入力
+  std::pair<double, double> gps_data_goal = {30.3741583,
+                                             130.9600750}; // ここは自分で入力
   //-------------------------------------------
   printf("lat: %f, lon: %f\n", gps_data_cansat.first, gps_data_cansat.second);
   if (gps_data_cansat.first == -1024.0 || gps_data_cansat.second == -1024.0) {
@@ -195,11 +196,11 @@ void fall_phase(Phase &phase, Flash &flash, BMP280 &bmp280, BNO055 &bno055,
     // sleep_ms(5000);
   }
   //   本番の緯度経度を踏まえて採用するか考える
-  //   if (g_lat < c_lat) {
-  //     phase = Phase::Goal;
-  //     printf("enter goal_phase");
-  //     sleep_ms(5000);
-  //   }
+  if (g_lat < c_lat) {
+    phase = Phase::Goal;
+    printf("enter goal_phase");
+    sleep_ms(5000);
+  }
 }
 
 // 加速度(進行方向)考慮ver---------------------------------------------------

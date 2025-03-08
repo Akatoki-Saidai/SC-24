@@ -63,15 +63,16 @@ int main() {
   BNO055 bno055(flash, i2c1);
 
   // UARTのセットアップ
-  // uart_init(uart0, 115200);
+  // uart_init(uart0, 9600);
   uart_init(uart0, 38400);
   gpio_set_function(0, GPIO_FUNC_UART);
   gpio_set_function(1, GPIO_FUNC_UART);
+  uart_set_baudrate(uart0, 38400);
 
   // GPSのセットアップ
   GPS gps(flash, uart0);
 
-  Phase phase = Phase::Fall; ////////////////////////////
+  Phase phase = Phase::Wait; ////////////////////////////
 
   // ************************************************** //
   //                        loop                        //
@@ -101,6 +102,7 @@ int main() {
       // return 0;
       // sd.write("aiueo");
       // gpio_put(9, 0);
+      printf("p: %d", int(phase));
 
       switch (phase) {
       case Phase::Wait:
